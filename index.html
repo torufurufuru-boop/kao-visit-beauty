@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kao 訪問美容 — 海辺の出張美容</title>
+<meta name="description" content="逗子・葉山・鎌倉へ伺う訪問ヘアスタイリング。サロンに行けない方のもとへ、笑顔を届けます。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Josefin+Sans:wght@300;400&family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ocean:#5BAEBC;
+  --ocean-l:#A8DDE4;
+  --ocean-ll:#D8ECF0;
+  --dawn:#F4C5BA;
+  --dawn-l:#EDD5CC;
+  --sand:#F8F6F4;
+  --sand-d:#F0ECE7;
+  --deep:#4A7D8A;
+  --muted:#8ABBC2;
+  --muted-d:#557F87;
+  --ink:#2C3E42;
+  --en:'Cormorant Garamond', serif;
+  --label:'Josefin Sans', sans-serif;
+  --jp-head:'Shippori Mincho', serif;
+  --jp:'Zen Kaku Gothic New', sans-serif;
+  --maxw:1180px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  background:var(--sand);
+  color:var(--ink);
+  font-family:var(--jp);
+  font-weight:300;
+  font-size:16px;
+  line-height:1.95;
+  letter-spacing:.04em;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+
+/* ---------- shared type ---------- */
+.eyebrow{
+  font-family:var(--label);
+  font-weight:300;
+  font-size:12.5px;
+  letter-spacing:.4em;
+  text-transform:uppercase;
+  color:var(--ocean);
+  display:flex;align-items:center;gap:.9em;
+}
+.eyebrow::before{
+  content:"";width:34px;height:1px;background:var(--ocean-l);display:inline-block;
+}
+.eyebrow.center{justify-content:center;}
+.eyebrow.center::after{content:"";width:34px;height:1px;background:var(--ocean-l);display:inline-block;}
+.section-en{
+  font-family:var(--en);
+  font-style:italic;
+  font-weight:300;
+  color:var(--deep);
+  line-height:1.05;
+  font-size:clamp(40px,6vw,76px);
+  letter-spacing:.01em;
+}
+.section-jp{
+  font-family:var(--jp-head);
+  font-weight:400;
+  color:var(--ink);
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+section{position:relative;}
+.pad{padding:clamp(96px,13vh,168px) 0;}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease);}
+.reveal.in{opacity:1;transform:none;}
+.reveal.d1{transition-delay:.09s;}
+.reveal.d2{transition-delay:.18s;}
+.reveal.d3{transition-delay:.27s;}
+.reveal.d4{transition-delay:.36s;}
+.reveal.d5{transition-delay:.45s;}
+
+/* ---------- image placeholder fallback ---------- */
+.ph{position:relative;overflow:hidden;background:
+   linear-gradient(135deg,var(--ocean-ll),var(--dawn-l));isolation:isolate;}
+.ph::after{
+  content:attr(data-ph);
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--label);font-size:11px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--deep);opacity:.55;z-index:0;text-align:center;padding:1em;
+}
+.ph img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s var(--ease);}
+.ph img.loaded{opacity:1;}
+
+/* ---------- header ---------- */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  background:rgba(248,246,244,.86);
+  backdrop-filter:saturate(150%) blur(18px);
+  -webkit-backdrop-filter:saturate(150%) blur(18px);
+  border-bottom:1px solid transparent;
+  transition:background .5s var(--ease),border-color .5s var(--ease),padding .5s var(--ease);
+}
+header.solid{background:rgba(248,246,244,.97);border-bottom:1px solid var(--sand-d);}
+.bar{
+  max-width:var(--maxw);margin:0 auto;padding:20px 32px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  transition:padding .5s var(--ease);
+}
+header.solid .bar{padding:14px 32px;}
+/* logo */
+.logo{display:flex;align-items:center;cursor:pointer;}
+.logo img{height:54px;width:auto;display:block;transition:height .5s var(--ease);filter:drop-shadow(0 1px 2px rgba(255,255,255,.85)) drop-shadow(0 2px 10px rgba(248,246,244,.6));}
+header.solid .logo img{height:44px;}
+/* nav */
+nav.main{display:flex;align-items:center;gap:38px;}
+nav.main a.link{
+  font-family:var(--label);font-weight:300;font-size:14px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--deep);position:relative;padding:4px 0;
+}
+nav.main a.link::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--ocean);transition:right .4s var(--ease);}
+nav.main a.link:hover::after{right:0;}
+.cta{
+  font-family:var(--label);font-weight:400;font-size:13.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:#fff;background:var(--ocean);padding:12px 26px;border-radius:999px;
+  transition:background .4s var(--ease),transform .4s var(--ease),box-shadow .4s var(--ease);
+  box-shadow:0 6px 22px -10px rgba(91,174,188,.8);white-space:nowrap;
+}
+.cta:hover{background:var(--deep);transform:translateY(-2px);box-shadow:0 12px 28px -10px rgba(74,125,138,.7);}
+.burger{display:none;flex-direction:column;gap:6px;width:30px;height:30px;justify-content:center;cursor:pointer;background:none;border:none;}
+.burger span{display:block;height:1.5px;width:26px;background:var(--deep);transition:transform .4s var(--ease),opacity .3s var(--ease);}
+.burger.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg);}
+
+/* mobile drawer */
+.drawer{
+  position:fixed;inset:0;z-index:55;background:rgba(248,246,244,.99);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;
+  opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility .5s;
+}
+.drawer.open{opacity:1;visibility:visible;}
+.drawer a{font-family:var(--jp-head);font-size:24px;color:var(--ink);letter-spacing:.1em;opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .5s var(--ease);}
+.drawer a .en{display:block;font-family:var(--en);font-style:italic;font-size:14px;color:var(--muted-d);letter-spacing:.1em;margin-top:2px;text-align:center;}
+.drawer.open a{opacity:1;transform:none;}
+.drawer.open a:nth-child(1){transition-delay:.08s;}
+.drawer.open a:nth-child(2){transition-delay:.14s;}
+.drawer.open a:nth-child(3){transition-delay:.2s;}
+.drawer.open a:nth-child(4){transition-delay:.26s;}
+.drawer.open a:nth-child(5){transition-delay:.32s;}
+.drawer.open a:nth-child(6){transition-delay:.4s;}
+
+/* ---------- hero ---------- */
+.hero{height:100vh;min-height:600px;position:relative;overflow:hidden;background:var(--ink);}
+.hero .slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s var(--ease);}
+.hero .slide.active{opacity:1;}
+.hero .slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform 6s linear;}
+.hero .slide.active img{transform:scale(1);}
+.hero .scrim{position:absolute;inset:0;background:
+   linear-gradient(180deg,rgba(44,62,66,.42) 0%,rgba(44,62,66,.16) 38%,rgba(44,62,66,.66) 100%),
+   linear-gradient(75deg,rgba(74,125,138,.46),transparent 62%);}
+.hero-inner{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:center;}
+.hero-inner .wrap{width:100%;}
+.badge{
+  display:inline-flex;align-items:center;gap:11px;align-self:flex-start;
+  background:rgba(248,246,244,.16);border:1px solid rgba(248,246,244,.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:9px 20px;border-radius:999px;margin-bottom:30px;
+}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--dawn);}
+.badge span{font-family:var(--label);font-weight:300;font-size:13px;letter-spacing:.26em;text-transform:uppercase;color:#fff;white-space:nowrap;}
+.hero h1{
+  font-family:var(--jp-head);font-weight:400;color:#fff;
+  font-size:clamp(32px,5.2vw,64px);line-height:1.4;letter-spacing:.04em;
+  text-shadow:0 2px 30px rgba(44,62,66,.4);
+  word-break:keep-all;line-break:strict;
+}
+.hero h1 .seg{display:inline-block;}
+.hero h1 em{font-family:var(--en);font-style:italic;font-weight:300;color:var(--dawn);}
+.hero h1 .accent{color:var(--dawn);font-style:normal;}
+.hero .lede{
+  margin-top:30px;max-width:33em;color:rgba(255,255,255,.92);
+  font-size:clamp(14px,1.5vw,17px);line-height:2.1;font-weight:300;
+  text-shadow:0 1px 16px rgba(44,62,66,.5);
+  line-break:strict;word-break:normal;
+}
+.hero .lede .seg{display:inline-block;}
+.hero .dots{position:absolute;bottom:42px;left:0;right:0;z-index:4;display:flex;justify-content:center;gap:14px;}
+.hero .dots button{width:36px;height:2px;border:none;background:rgba(255,255,255,.4);cursor:pointer;padding:0;transition:background .4s var(--ease);}
+.hero .dots button.active{background:#fff;}
+.scrollcue{position:absolute;bottom:38px;right:max(32px,calc((100vw - var(--maxw))/2 + 32px));z-index:4;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.scrollcue .ln{width:1px;height:54px;background:linear-gradient(rgba(255,255,255,.7),rgba(255,255,255,0));animation:cue 2.4s var(--ease) infinite;transform-origin:top;}
+.scrollcue small{font-family:var(--label);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:rgba(255,255,255,.7);writing-mode:vertical-rl;}
+@keyframes cue{0%{transform:scaleY(0);opacity:0;}40%{opacity:1;}100%{transform:scaleY(1);opacity:0;}}
+
+/* ---------- concept ---------- */
+.concept{background:var(--sand);text-align:center;}
+.concept .inner{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:34px;}
+.concept .section-en{font-size:clamp(34px,5vw,62px);}
+.concept p.body{font-family:var(--jp-head);font-weight:400;font-size:clamp(18px,2.2vw,25px);line-height:2.5;color:var(--deep);letter-spacing:.1em;text-wrap:balance;}
+.concept .small{color:var(--muted-d);font-size:16px;line-height:2.3;max-width:34em;}
+.wave-div{display:flex;align-items:center;gap:18px;color:var(--ocean-l);}
+.wave-div svg{width:64px;height:14px;}
+.wave-div .pearl{width:5px;height:5px;border-radius:50%;background:var(--dawn);}
+/* values */
+.values-label{margin-top:80px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.values-label .ja{font-family:var(--jp-head);font-weight:500;font-size:clamp(20px,2.4vw,27px);color:var(--ink);letter-spacing:.14em;}
+.values{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:52px;text-align:left;}
+.values .v{padding:8px 40px;position:relative;display:flex;flex-direction:column;gap:14px;}
+.values .v + .v::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:1px;background:var(--ocean-ll);}
+.values .vno{display:flex;align-items:center;gap:12px;}
+.values .vno .num{font-family:var(--en);font-style:italic;font-weight:400;font-size:34px;color:var(--ocean);line-height:1;}
+.values .vno .en{font-family:var(--label);font-weight:300;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted-d);}
+.values .v h4{font-family:var(--jp-head);font-weight:500;font-size:19px;color:var(--ink);letter-spacing:.08em;line-height:1.6;}
+.values .v p{font-size:15px;line-height:2.2;color:var(--muted-d);letter-spacing:.03em;}
+@media(max-width:760px){
+  .values{grid-template-columns:1fr;gap:40px;}
+  .values .v{padding:0;}
+  .values .v + .v::before{display:none;}
+  .values .v + .v{padding-top:40px;border-top:1px solid var(--ocean-ll);}
+}
+
+/* ---------- menu ---------- */
+.menu{background:linear-gradient(180deg,var(--sand) 0%,var(--ocean-ll) 100%);}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:64px;flex-wrap:wrap;}
+.head-row .lead{display:flex;flex-direction:column;gap:18px;}
+.head-row .note{max-width:24em;color:var(--deep);font-size:15px;line-height:2.05;}
+.head-row .note .seg{white-space:nowrap;}
+.head-row .note-col{max-width:26em;display:flex;flex-direction:column;gap:16px;align-items:flex-start;}
+.head-row .note-col .note{margin:0;}
+.fee-pill{display:inline-flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--ocean-l);border-radius:999px;padding:11px 22px;box-shadow:0 12px 30px -18px rgba(74,125,138,.7);}
+.fee-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--dawn);flex:none;}
+.fee-pill .txt{font-family:var(--jp-head);font-weight:500;font-size:15.5px;color:var(--ink);letter-spacing:.05em;}
+.fee-pill b{font-family:var(--en);font-style:italic;font-weight:400;font-size:23px;color:var(--deep);margin:0 3px;letter-spacing:.01em;}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.card{
+  background:rgba(255,255,255,.7);border:1px solid rgba(168,221,228,.6);
+  border-radius:4px;padding:40px 34px 36px;position:relative;overflow:hidden;
+  transition:transform .6s var(--ease),box-shadow .6s var(--ease),background .6s var(--ease);
+}
+.card::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--ocean),var(--dawn));transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);}
+.card:hover{transform:translateY(-6px);box-shadow:0 30px 50px -34px rgba(74,125,138,.55);background:#fff;}
+.card:hover::before{transform:scaleX(1);}
+.card .no{font-family:var(--label);font-size:13px;letter-spacing:.3em;color:var(--ocean);}
+.card .en{font-family:var(--en);font-style:italic;font-weight:400;font-size:34px;color:var(--ink);line-height:1.1;margin-top:14px;}
+.card .ja{font-family:var(--jp-head);font-size:16px;color:var(--deep);letter-spacing:.16em;margin-top:6px;}
+.card .desc{font-size:15px;line-height:2.05;color:var(--ink);margin-top:20px;min-height:5.6em;opacity:.92;}
+.card .price{display:flex;align-items:baseline;gap:4px;margin-top:18px;padding-top:18px;border-top:1px solid var(--ocean-ll);}
+.card .price .yen{font-family:var(--en);font-style:italic;font-size:28px;color:var(--deep);}
+.card .price .from{font-family:var(--label);font-size:12px;letter-spacing:.2em;color:var(--muted-d);text-transform:uppercase;}
+.card .subnote{font-size:13px;line-height:1.75;color:var(--muted-d);margin-top:12px;letter-spacing:.02em;display:flex;align-items:flex-start;gap:7px;}
+.card .subnote::before{content:"+";font-family:var(--en);font-style:italic;color:var(--dawn);font-size:16px;line-height:1.2;}
+.card .price.soon{border-top-color:var(--dawn-l);}
+.card .price.soon .label{font-family:var(--label);font-size:13.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted-d);}
+.card .price.soon .label::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dawn);margin-right:11px;vertical-align:middle;}
+.card.upcoming{background:rgba(255,255,255,.5);}
+.card.upcoming .en,.card.upcoming .ja{opacity:.78;}
+
+/* ---------- travel fee ---------- */
+.fee{background:var(--ocean-ll);}
+.fee-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:64px;align-items:start;}
+.fee .panel{background:var(--sand);border-radius:6px;padding:46px 44px;box-shadow:0 40px 70px -50px rgba(74,125,138,.6);}
+.fee .panel h3{font-family:var(--jp-head);font-weight:400;font-size:20px;color:var(--ink);letter-spacing:.1em;margin-bottom:8px;}
+.fee .fee-head{font-family:var(--jp-head);font-weight:400;font-size:clamp(22px,2.6vw,28px);color:var(--ink);letter-spacing:.1em;margin-bottom:22px;line-height:1.5;}
+.fee .fee-intro{font-size:16px;color:var(--deep);line-height:2.15;margin-bottom:18px;}
+.fee .fee-note{font-size:14px;color:var(--muted-d);line-height:2;}
+.fee .panel .hint{font-size:14.5px;color:var(--muted-d);line-height:2;margin-bottom:26px;}
+.zip-row{display:flex;gap:12px;align-items:stretch;}
+.zip-field{flex:1;position:relative;}
+.zip-field label{position:absolute;top:-9px;left:14px;background:var(--sand);padding:0 7px;font-family:var(--label);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ocean);}
+.zip-field input{
+  width:100%;height:64px;border:1.5px solid var(--ocean-l);background:#fff;border-radius:4px;
+  font-family:var(--en);font-size:30px;letter-spacing:.14em;color:var(--ink);text-align:center;
+  transition:border-color .4s var(--ease),box-shadow .4s var(--ease);
+}
+.zip-field input:focus{outline:none;border-color:var(--ocean);box-shadow:0 0 0 4px rgba(91,174,188,.16);}
+.zip-field input::placeholder{color:var(--ocean-l);}
+.zip-btn{
+  border:none;cursor:pointer;background:var(--deep);color:#fff;padding:0 30px;border-radius:4px;
+  font-family:var(--label);font-size:13.5px;letter-spacing:.2em;text-transform:uppercase;
+  transition:background .4s var(--ease);white-space:nowrap;
+}
+.zip-btn:hover{background:var(--ocean);}
+.result{margin-top:26px;min-height:96px;border:1px dashed var(--ocean-l);border-radius:4px;display:flex;align-items:center;gap:20px;padding:22px 26px;opacity:.55;transition:opacity .5s var(--ease),border-color .5s var(--ease),background .5s var(--ease);}
+.result.show{opacity:1;border-style:solid;}
+.result .rbadge{flex:none;width:74px;height:74px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--en);font-style:italic;line-height:1;}
+.result .rbadge .t{font-size:11px;font-family:var(--label);font-style:normal;letter-spacing:.1em;margin-bottom:3px;opacity:.85;}
+.result .rbadge .v{font-size:24px;}
+.result .rtext .area{font-family:var(--jp-head);font-size:18px;color:var(--ink);}
+.result .rtext .fee-amt{font-size:15px;color:var(--deep);margin-top:4px;}
+.result.placeholder .rbadge{background:var(--ocean-l);}
+.tiers{display:flex;flex-direction:column;gap:0;}
+.tiers .trow{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:22px 4px;border-bottom:1px solid var(--ocean-l);}
+.tiers .trow:last-child{border-bottom:none;}
+.tiers .swatch{width:12px;height:12px;border-radius:50%;}
+.tiers .tname{font-size:15.5px;color:var(--ink);}
+.tiers .tname b{font-family:var(--jp-head);font-weight:500;font-size:17px;display:block;margin-bottom:2px;letter-spacing:.06em;}
+.tiers .tname span{font-size:13.5px;color:var(--muted-d);}
+.tiers .tfee{font-family:var(--en);font-style:italic;font-size:22px;color:var(--deep);white-space:nowrap;}
+.fee .privacy{margin-top:30px;font-size:13px;color:var(--muted-d);line-height:2.05;display:flex;flex-direction:column;gap:4px;}
+.fee .privacy span{padding-left:1.2em;text-indent:-1.2em;}
+
+/* ---------- gallery ---------- */
+.gallery{background:var(--sand);}
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:300px;gap:14px;}
+.gal-item{position:relative;overflow:hidden;border-radius:4px;}
+.gal-item.wide{grid-column:span 2;}
+.gal-item img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease);}
+.gal-item:hover img{transform:scale(1.04);}
+.gal-item .cap{position:absolute;left:0;bottom:0;padding:18px 22px;z-index:2;background:linear-gradient(transparent,rgba(44,62,66,.55));width:100%;}
+.gal-item .cap span{font-family:var(--label);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#fff;}
+
+/* ---------- reserve ---------- */
+.reserve{background:var(--deep);color:#fff;position:relative;overflow:hidden;text-align:center;}
+.reserve::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(91,174,188,.4),transparent 55%),radial-gradient(circle at 85% 90%,rgba(244,197,186,.28),transparent 50%);}
+.reserve .inner{position:relative;z-index:2;max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;}
+.reserve .eyebrow{color:var(--dawn);}
+.reserve .eyebrow::before,.reserve .eyebrow::after{background:rgba(244,197,186,.5);}
+.reserve .section-en{color:#fff;}
+.reserve p.r-lede{color:rgba(255,255,255,.93);font-size:16.5px;line-height:2.25;max-width:32em;}
+.contact-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+.cbtn{display:inline-flex;align-items:center;gap:11px;padding:16px 30px;border-radius:999px;font-family:var(--label);font-size:13px;letter-spacing:.18em;text-transform:uppercase;transition:transform .4s var(--ease),background .4s var(--ease),box-shadow .4s var(--ease);}
+.cbtn.primary{background:var(--dawn);color:var(--ink);box-shadow:0 14px 30px -14px rgba(244,197,186,.9);}
+.cbtn.primary:hover{transform:translateY(-3px);background:#fff;}
+.cbtn.ghost{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;}
+.cbtn.ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-3px);}
+.cbtn svg{width:17px;height:17px;}
+.reserve .phone{display:inline-block;margin-top:18px;font-family:var(--en);font-style:italic;font-size:28px;color:#fff;letter-spacing:.04em;transition:opacity .3s var(--ease);}
+.reserve a.phone:hover{opacity:.78;}
+.reserve .hours{font-size:13.5px;color:rgba(255,255,255,.85);letter-spacing:.08em;}
+
+/* ---------- about ---------- */
+.about{background:var(--sand);}
+.about-grid{display:grid;grid-template-columns:0.85fr 1fr;gap:72px;align-items:center;}
+.about .portrait{aspect-ratio:1380/2048;border-radius:6px;background:#fff;box-shadow:0 50px 80px -50px rgba(74,125,138,.6);}
+.about .copy{display:flex;flex-direction:column;gap:22px;}
+.about .copy .section-en{font-size:clamp(36px,4.6vw,58px);}
+.about .copy h3{font-family:var(--jp-head);font-weight:400;font-size:22px;color:var(--deep);letter-spacing:.1em;}
+.about .copy p{font-size:16px;line-height:2.25;color:var(--ink);opacity:.95;}
+.about .copy p em{font-style:normal;color:var(--deep);font-weight:500;border-bottom:1px solid var(--ocean-l);padding-bottom:1px;}
+.about .sign{display:flex;align-items:center;gap:16px;margin-top:8px;}
+.about .sign .nm{font-family:var(--en);font-style:italic;font-size:30px;color:var(--ink);}
+.about .sign .nm small{display:block;font-family:var(--jp);font-size:13px;letter-spacing:.28em;color:var(--muted-d);margin-top:3px;font-style:normal;}
+.about .sign .ln{flex:1;height:1px;background:var(--ocean-l);}
+
+/* ---------- footer ---------- */
+footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
+.foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:50px;flex-wrap:wrap;}
+.foot-logo img{height:104px;width:auto;display:block;opacity:.95;}
+.foot-logo p{font-size:14px;color:rgba(255,255,255,.72);margin-top:24px;line-height:2.05;max-width:24em;}
+.foot-nav{display:flex;gap:60px;flex-wrap:wrap;}
+.foot-col{display:flex;flex-direction:column;gap:14px;}
+.foot-col .ti{font-family:var(--label);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--ocean-l);margin-bottom:4px;}
+.foot-col a,.foot-col span{font-size:14.5px;color:rgba(255,255,255,.84);transition:color .3s var(--ease);}
+.foot-col a:hover{color:#fff;}
+.foot-bottom{margin-top:60px;padding-top:26px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12.5px;letter-spacing:.08em;color:rgba(255,255,255,.5);}
+
+/* ---------- responsive ---------- */
+@media(max-width:980px){
+  .fee-grid{grid-template-columns:1fr;gap:48px;}
+  .about-grid{grid-template-columns:1fr;gap:44px;}
+  .about .portrait{max-width:420px;}
+}
+@media(max-width:680px){
+  body{font-size:15px;}
+  nav.main{display:none;}
+  .bar .cta{display:none;}
+  .burger{display:flex;}
+  .wrap{padding:0 22px;}
+  .bar{padding:16px 22px;}
+  .logo img{height:46px;}
+  header.solid .logo img{height:40px;}
+  header.solid .bar{padding:13px 22px;}
+  .menu-grid{grid-template-columns:1fr;}
+  .gal-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px;}
+  .gal-item.wide{grid-column:span 2;}
+  .card .desc{min-height:0;}
+  .head-row{margin-bottom:44px;}
+  .zip-row{flex-direction:column;}
+  .zip-btn{height:56px;}
+  .scrollcue{display:none;}
+  .fee .panel{padding:34px 26px;}
+}
+@media(max-width:430px){
+  .gal-grid{grid-template-columns:1fr;}
+  .gal-item.wide{grid-column:span 1;}
+}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <div class="bar">
+    <a class="logo" href="#top" aria-label="kao 訪問美容 ホーム">
+      <img src="assets/kao-logo.png" alt="kao 訪問美容 — hair stylist">
+    </a>
+    <nav class="main" aria-label="メインナビゲーション">
+      <a class="link" href="#concept">Concept</a>
+      <a class="link" href="#menu">Menu</a>
+      <a class="link" href="#fee">Fee</a>
+      <a class="link" href="#gallery">Gallery</a>
+      <a class="link" href="#about">About</a>
+      <a class="cta" href="#reserve">ご予約</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="メニューを開く" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+<div class="drawer" id="drawer">
+  <a href="#concept">コンセプト<span class="en">Concept</span></a>
+  <a href="#menu">メニュー<span class="en">Menu</span></a>
+  <a href="#fee">出張費用<span class="en">Travel Fee</span></a>
+  <a href="#gallery">ギャラリー<span class="en">Gallery</span></a>
+  <a href="#about">かおりについて<span class="en">About</span></a>
+  <a href="#reserve" class="cta" style="display:inline-block;">ご予約・お問い合わせ</a>
+</div>
+<main id="top">
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="hero">
+  <div class="slide active">
+    <div class="ph" style="width:100%;height:100%;" data-ph="Hero — 海辺の朝">
+      <img alt="海辺の静かな朝の風景" data-src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1700&q=80&auto=format&fit=crop">
+    </div>
+  </div>
+  <div class="slide">
+    <div class="ph" style="width:100%;height:100%;" data-ph="Hero — 施術の手しごと">
+      <img alt="髪を整えるスタイリストの手元" data-src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1700&q=80&auto=format&fit=crop">
+    </div>
+  </div>
+  <div class="slide">
+    <div class="ph" style="width:100%;height:100%;" data-ph="Hero — おだやかな時間">
+      <img alt="窓辺で微笑む女性" data-src="https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=1700&q=80&auto=format&fit=crop">
+    </div>
+  </div>
+  <div class="scrim"></div>
+  <div class="hero-inner">
+    <div class="wrap">
+      <div class="badge"><span class="dot"></span><span>訪問美容 · 出張ヘアスタイリング</span></div>
+      <h1><span class="seg">想いに寄り添う</span><span class="seg">訪問美容。</span><br><span class="seg"><span class="accent">あなただけ</span>の、</span><span class="seg">特別な時間。</span></h1>
+      <p class="lede"><span class="seg">じっくりとお話を伺い、</span><span class="seg">ご本人の体調に合わせた</span><span class="seg">無理のない施術を。</span><br><span class="seg">ご家族みんなが</span><span class="seg">安心できる時間を紡ぎます。</span></p>
+    </div>
+  </div>
+  <div class="dots" id="dots" role="tablist" aria-label="スライド切替">
+    <button class="active" aria-label="スライド 1"></button>
+    <button aria-label="スライド 2"></button>
+    <button aria-label="スライド 3"></button>
+  </div>
+  <div class="scrollcue"><small>Scroll</small><span class="ln"></span></div>
+</section>
+
+<!-- ========== CONCEPT ========== -->
+<section class="concept pad" id="concept">
+  <div class="wrap">
+    <div class="inner">
+      <div class="eyebrow center reveal">Concept</div>
+      <h2 class="section-en reveal d1">By&nbsp;Your&nbsp;Side</h2>
+      <div class="wave-div reveal d2">
+        <span class="pearl"></span>
+        <svg viewBox="0 0 64 14" fill="none" aria-hidden="true"><path d="M1 7 Q9 1 17 7 T33 7 T49 7 T63 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span class="pearl"></span>
+      </div>
+      <p class="body reveal d2">サロンの特別を、いつもの暮らしの場所へ。<br>ご自宅や施設へ伺う、出張専門の美容室です。<br>髪を整えるその時間が、心まで軽くなりますように。</p>
+      <p class="small reveal d3">年齢を重ねても、体が思うように動かなくなっても。鏡の前で「いいね」とこぼれる、あの小さな喜びを諦めないでほしい。kao は、おひとりおひとりのもとへ伺う訪問美容です。</p>
+    </div>
+    <div class="values-label reveal d3">
+      <div class="eyebrow center">What We Cherish</div>
+      <div class="ja">大切にしていること</div>
+    </div>
+    <div class="values">
+      <div class="v reveal">
+        <div class="vno"><span class="num">01</span><span class="en">With You &amp; Yours</span></div>
+        <h4>ご本人と、ご家族の想いに</h4>
+        <p>ご本人の「こうありたい」と、ご家族の「こうしてあげたい」。その両方の間に立ち、ひとつの仕上がりへと整えていきます。</p>
+      </div>
+      <div class="v reveal d1">
+        <div class="vno"><span class="num">02</span><span class="en">Comfort &amp; Dignity</span></div>
+        <h4>体調と尊厳を、まんなかに</h4>
+        <p>けっして急がず、その日のご様子を見極めて。横になったままでも、装いも気持ちも損なわない時間をお届けします。</p>
+      </div>
+      <div class="v reveal d2">
+        <div class="vno"><span class="num">03</span><span class="en">Listening First</span></div>
+        <h4>聞くことから、はじめる</h4>
+        <p>施術前に、まずお話を。ご希望も小さな不安も残さず伺うことが、心からお任せいただける関係の第一歩だと考えています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MENU ========== -->
+<section class="menu pad" id="menu">
+  <div class="wrap">
+    <div class="head-row">
+      <div class="lead">
+        <div class="eyebrow reveal">Menu &amp; Price</div>
+        <h2 class="section-en reveal d1">Services</h2>
+      </div>
+      <div class="note-col reveal d2">
+        <p class="note">価格はすべて税込です。現在ご提供はカットのみ、その他のメニューは順次公開予定です。</p>
+        <div class="fee-pill"><span class="dot"></span><span class="txt">出張費は別途 <b>¥1,100</b>（税込）を申し受けます。</span></div>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <article class="card reveal">
+        <div class="no">01</div>
+        <div class="en">Cut</div>
+        <div class="ja">カット</div>
+        <p class="desc">シャンプー・ブロー込み。表情とくせを見ながら、扱いやすく似合うかたちへ。</p>
+        <div class="price"><span class="yen">¥4,400</span></div>
+        <div class="subnote">ベッド上でのカットは +¥1,100</div>
+      </article>
+      <article class="card upcoming reveal d1">
+        <div class="no">02</div>
+        <div class="en">Color</div>
+        <div class="ja">カラー</div>
+        <p class="desc">白髪染め・おしゃれ染め。頭皮にやさしい低刺激カラーを使用します。</p>
+        <div class="price soon"><span class="label">Coming Soon</span></div>
+      </article>
+      <article class="card upcoming reveal d2">
+        <div class="no">03</div>
+        <div class="en">Perm</div>
+        <div class="ja">パーマ</div>
+        <p class="desc">ナチュラルからしっかりカールまで。ダメージを抑えた薬剤で。</p>
+        <div class="price soon"><span class="label">Coming Soon</span></div>
+      </article>
+      <article class="card upcoming reveal">
+        <div class="no">04</div>
+        <div class="en">Head Spa</div>
+        <div class="ja">ヘッドスパ</div>
+        <p class="desc">頭皮をほぐすマッサージと集中トリートメント。深い安らぎのひととき。</p>
+        <div class="price soon"><span class="label">Coming Soon</span></div>
+      </article>
+      <article class="card upcoming reveal d1">
+        <div class="no">05</div>
+        <div class="en">Treatment</div>
+        <div class="ja">トリートメント</div>
+        <p class="desc">乾燥やダメージが気になる髪へ。内側から補修し、しなやかな手触りに。</p>
+        <div class="price soon"><span class="label">Coming Soon</span></div>
+      </article>
+      <article class="card upcoming reveal d2">
+        <div class="no">06</div>
+        <div class="en">Set / Arrange</div>
+        <div class="ja">セット・アレンジ</div>
+        <p class="desc">お祝いや記念日に。その日の装いに合わせたヘアセットを。</p>
+        <div class="price soon"><span class="label">Coming Soon</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TRAVEL FEE ========== -->
+<section class="fee pad" id="fee">
+  <div class="wrap">
+    <div class="fee-grid">
+      <div class="reveal">
+        <div class="eyebrow" style="margin-bottom:22px;">Travel Fee &amp; Area</div>
+        <h3 class="fee-head">訪問範囲とご出張費</h3>
+        <p class="fee-intro">逗子市全域、葉山町、鎌倉市へ伺います。<br>ご自宅はもちろん、施設・介護施設への出張も承ります。</p>
+        <p class="fee-note">近隣の地域も、まずはお気軽にご相談ください。</p>
+      </div>
+      <div class="reveal d1">
+        <div class="tiers">
+          <div class="trow">
+            <span class="swatch" style="background:var(--ocean)"></span>
+            <div class="tname"><b>訪問範囲</b><span>逗子市全域 ・ 葉山町 ・ 鎌倉市</span></div>
+            <div class="tfee">¥1,100</div>
+          </div>
+          <div class="trow">
+            <span class="swatch" style="background:var(--ink)"></span>
+            <div class="tname"><b>それ以外の地域</b><span>近隣エリアはお問い合わせください</span></div>
+            <div class="tfee">要相談</div>
+          </div>
+        </div>
+        <div class="privacy">
+          <span>※ 出張費は訪問範囲内一律 1,100円（税込）です。</span>
+          <span>※ 施設・介護施設への出張も承ります。</span>
+          <span>※ 近隣地域や詳細は、お気軽にご相談ください。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== GALLERY ========== -->
+<section class="gallery pad" id="gallery">
+  <div class="wrap">
+    <div class="head-row">
+      <div class="lead">
+        <div class="eyebrow reveal">Gallery</div>
+        <h2 class="section-en reveal d1">Moments</h2>
+      </div>
+      <p class="note reveal d2"><span class="seg">施術のひとこま、</span><span class="seg">海辺の光、</span><span class="seg">おだやかな時間。</span><span class="seg">kao の雰囲気を皆様にお届け致します。</span></p>
+    </div>
+    <div class="gal-grid">
+      <div class="gal-item wide reveal">
+        <div class="ph" style="width:100%;height:100%;" data-ph="Gallery — 施術風景（ワイド）">
+          <img alt="施術風景" data-src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=1200&q=80&auto=format&fit=crop">
+        </div>
+        <div class="cap"><span>At Home Styling</span></div>
+      </div>
+      <div class="gal-item reveal d1">
+        <div class="ph" style="width:100%;height:100%;" data-ph="Gallery — 施術の一コマ">
+          <img alt="施術の一コマ — 笑顔のおふたり" style="object-position:50% 38%;" data-src="assets/gallery-peace.jpg">
+        </div>
+        <div class="cap"><span>Smiles Together</span></div>
+      </div>
+      <div class="gal-item reveal d1">
+        <div class="ph" style="width:100%;height:100%;" data-ph="Gallery — 道具">
+          <img alt="美容の道具" data-src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=80&auto=format&fit=crop">
+        </div>
+        <div class="cap"><span>The Tools</span></div>
+      </div>
+      <div class="gal-item reveal d2">
+        <div class="ph" style="width:100%;height:100%;" data-ph="Gallery — 海辺">
+          <img alt="海辺の風景" data-src="https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?w=800&q=80&auto=format&fit=crop">
+        </div>
+        <div class="cap"><span>By the Sea</span></div>
+      </div>
+      <div class="gal-item reveal d2">
+        <div class="ph" style="width:100%;height:100%;" data-ph="Gallery — トリートメント">
+          <img alt="トリートメントの様子" data-src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=1200&q=80&auto=format&fit=crop">
+        </div>
+        <div class="cap"><span>Care &amp; Treatment</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== RESERVE ========== -->
+<section class="reserve pad" id="reserve">
+  <div class="wrap">
+    <div class="inner">
+      <div class="eyebrow center reveal">Reservation</div>
+      <h2 class="section-en reveal d1" style="font-family:var(--jp-head);font-style:normal;font-size:clamp(30px,4.4vw,52px);line-height:1.55;letter-spacing:.06em;">お気軽に、<br>ご相談ください。</h2>
+      <p class="r-lede reveal d2">ご予約・ご相談はお気軽に。ご本人さま、ご家族さま、施設のご担当者さまからのお問い合わせも歓迎しております。日程と内容をお伺いし、当日伺います。</p>
+      <div class="contact-row reveal d3">
+        <a class="cbtn primary" href="#" onclick="return false;">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 5.6 2 10c0 2.5 1.4 4.7 3.7 6.2-.2.7-.7 2.4-.8 2.8 0 0-.02.2.1.27.13.08.28 0 .28 0 .37-.05 2.4-1.6 3.3-2.25.4.06.9.1 1.4.1 5.5 0 10-3.6 10-8S17.5 2 12 2z"/></svg>
+          LINEで予約・相談
+        </a>
+        <a class="cbtn ghost" href="tel:09000000000">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L20 18v-4l-5-2 0 0"/><path d="M4 4c0 8 8 16 16 16"/></svg>
+          お電話
+        </a>
+        <a class="cbtn ghost" href="mailto:hello@kao-visit.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
+          メール
+        </a>
+      </div>
+      <a class="phone reveal d4" href="tel:09000000000">090 - 0000 - 0000</a>
+      <div class="hours reveal d4">受付 9:00 – 18:00 ／ 不定休 ・ 前日までのご予約がおすすめです</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ABOUT ========== -->
+<section class="about pad" id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="portrait ph reveal" data-ph="About — かおりのポートレート">
+        <img alt="スタイリスト かおり" data-src="assets/about-kaori-full.png">
+      </div>
+      <div class="copy">
+        <div class="eyebrow reveal">About</div>
+        <h2 class="section-en reveal d1">Kaori</h2>
+        <h3 class="reveal d1">「行けないから」と、<br>おしゃれを諦めないでほしい。</h3>
+        <p class="reveal d2">美容室のスタイリストとして、22年。たくさんのお客さまの髪に触れてきたなかで、ご高齢やご病気を理由に「だんだんお店へ来られなくなってしまう」——そんな寂しい現実を、何度も目にしてきました。</p>
+        <p class="reveal d2">「髪をきれいにしたい。でも、行くのが難しい」。その声に応えたい一心で<em>訪問福祉理美容師</em>の資格を取得し、訪問美容の現場へ。髪がさっぱり整うだけで、こんなにも表情がやわらぐのかと、この仕事の意味を日々かみしめています。</p>
+        <p class="reveal d2">さまざまな事情で外出がむずかしくなった方へ。22年のサロンワークで培った確かな技術と福祉の知識をもって、ご自宅や施設へ、安心・安全なサロンのひとときをお届けします。髪が変わると、心もすっと軽くなる。どうぞ、お気軽にご相談ください。</p>
+        <div class="sign reveal d3">
+          <span class="nm">Kaori<small>かおり ・ 訪問ヘアスタイリスト</small></span>
+          <span class="ln"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-logo">
+        <img src="assets/kao-logo-white.png" alt="kao 訪問美容">
+        <p>逗子・葉山・鎌倉の海辺の町から。サロンに行けない方のもとへ、笑顔を届けに伺います。</p>
+      </div>
+      <div class="foot-nav">
+        <div class="foot-col">
+          <span class="ti">Menu</span>
+          <a href="#concept">コンセプト</a>
+          <a href="#menu">メニュー・料金</a>
+          <a href="#fee">出張費用</a>
+          <a href="#gallery">ギャラリー</a>
+          <a href="#about">かおりについて</a>
+        </div>
+        <div class="foot-col">
+          <span class="ti">Area</span>
+          <span>逗子市 全域</span>
+          <span>葉山町</span>
+          <span>鎌倉市</span>
+          <span>その他地域は要相談</span>
+        </div>
+        <div class="foot-col">
+          <span class="ti">Contact</span>
+          <a href="#reserve">LINEで予約・相談</a>
+          <a href="tel:09000000000">お電話 090-0000-0000</a>
+          <a href="mailto:hello@kao-visit.com">メール</a>
+          <span>9:00 – 18:00 / 不定休</span>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 kao 訪問美容. All rights reserved.</span>
+      <span>逗子・葉山・鎌倉 — 海辺の出張美容</span>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- lazy image load w/ graceful fallback ---------- */
+  document.querySelectorAll('.ph img[data-src]').forEach(function(img){
+    img.src = img.getAttribute('data-src');
+    img.addEventListener('load', function(){ img.classList.add('loaded'); });
+    img.addEventListener('error', function(){ img.style.display='none'; });
+  });
+
+  /* ---------- header solid on scroll ---------- */
+  var hdr = document.getElementById('hdr');
+  function onScroll(){ hdr.classList.toggle('solid', window.scrollY > 40); }
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  /* ---------- mobile drawer ---------- */
+  var burger = document.getElementById('burger');
+  var drawer = document.getElementById('drawer');
+  function setDrawer(open){
+    drawer.classList.toggle('open', open);
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  burger.addEventListener('click', function(){ setDrawer(!drawer.classList.contains('open')); });
+  drawer.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setDrawer(false); }); });
+
+  /* ---------- hero slideshow ---------- */
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.hero .slide'));
+  var dots = Array.prototype.slice.call(document.querySelectorAll('#dots button'));
+  var idx = 0, timer;
+  function go(n){
+    idx = (n + slides.length) % slides.length;
+    slides.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    dots.forEach(function(d,i){ d.classList.toggle('active', i===idx); });
+  }
+  function next(){ go(idx+1); }
+  function start(){ stop(); timer = setInterval(next, 4000); }
+  function stop(){ if(timer) clearInterval(timer); }
+  dots.forEach(function(d,i){ d.addEventListener('click', function(){ go(i); start(); }); });
+  start();
+  document.addEventListener('visibilitychange', function(){ document.hidden ? stop() : start(); });
+
+  /* ---------- IntersectionObserver reveal ---------- */
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+
+})();
+</script>
+</body>
+</html>
