@@ -67,6 +67,8 @@ input,select,textarea{font-family:var(--jp);font-size:14px;}
 .btn-ghost:hover{background:var(--ocean-ll);}
 .btn-danger{background:transparent;color:#c0392b;border:1px solid #f5c6c6;font-size:11px;padding:6px 14px;}
 .btn-danger:hover{background:#fff5f5;}
+.btn-map{background:transparent;color:var(--deep);border:1px solid var(--ocean-l);font-size:11px;padding:6px 14px;}
+.btn-map:hover{background:var(--ocean-ll);}
 .btn-sm{padding:6px 14px;font-size:11px;}
 
 /* ===== TABLE ===== */
@@ -266,6 +268,10 @@ tbody tr:hover{background:var(--sand);}
       <label>お名前（顧客未登録の場合）</label>
       <input type="text" id="res-name" placeholder="山田 花子 様">
     </div>
+    <div class="form-row">
+      <label>訪問先住所</label>
+      <input type="text" id="res-address" placeholder="逗子市… （顧客選択時に自動入力）">
+    </div>
     <div class="form-2col">
       <div class="form-row">
         <label>メニュー *</label>
@@ -433,6 +439,7 @@ function renderReservations(){
       '<td><span class="badge '+STATUS_CLASS[r.status]+'">'+STATUS_LABEL[r.status]+'</span></td>'+
       '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted-d)">'+esc(r.notes||'')+'</td>'+
       '<td><div class="td-actions">'+
+        '<button class="btn btn-map btn-sm" onclick="openMaps(\''+r.id+'\')" title="Googleマップでルートを開く">🗺 地図</button>'+
         '<button class="btn btn-ghost btn-sm" onclick="editRes(\''+r.id+'\')">編集</button>'+
         '<button class="btn btn-danger btn-sm" onclick="delRes(\''+r.id+'\')">削除</button>'+
       '</div></td>'+
@@ -466,6 +473,7 @@ function openResModal(id){
     document.getElementById('res-menu').value = r.menu||'カット';
     document.getElementById('res-status').value = r.status||'confirmed';
     document.getElementById('res-notes').value = r.notes||'';
+    document.getElementById('res-address').value = r.address||'';
   } else {
     document.getElementById('res-id').value = '';
     document.getElementById('res-date').value = new Date().toISOString().slice(0,10);
@@ -475,11 +483,56 @@ function openResModal(id){
     document.getElementById('res-menu').value = 'カット';
     document.getElementById('res-status').value = 'confirmed';
     document.getElementById('res-notes').value = '';
+    document.getElementById('res-address').value = '';
   }
   resBg.classList.add('open');
 }
 
+document.getElementById('res-customer').addEventListener('change', function(){
+  var custId = this.value;
+  if(!custId) return;
+  var cust = loadCustomers().find(function(c){ return c.id===custId; });
+  if(cust && cust.address && !document.getElementById('res-address').value){
+    document.getElementById('res-address').value = cust.address;
+  }
+});
+
 window.editRes = function(id){ openResModal(id); };
+
+window.openMaps = function(id){
+  var HOME = '逗子市沼間4-4-19';
+  var res = loadReservations();
+  var custs = loadCustomers();
+  var r = res.find(function(x){ return x.id===id; });
+  if(!r) return;
+
+  // 目的地の住所
+  var destCust = custs.find(function(c){ return c.id===r.customerId; });
+  var dest = r.address || (destCust && destCust.address) || '';
+  if(!dest){ alert('訪問先の住所が登録されていません。\n予約の「訪問先住所」または顧客の住所を入力してください。'); return; }
+
+  // 同日の予約を時間順に並べて、この予約より前の直近の予約を探す
+  var sameDay = res
+    .filter(function(x){ return x.date===r.date && x.id!==r.id && x.status!=='cancelled'; })
+    .sort(function(a,b){ return a.time>b.time?1:a.time<b.time?-1:0; });
+
+  var prevRes = null;
+  for(var i=0; i<sameDay.length; i++){
+    if(sameDay[i].time < r.time) prevRes = sameDay[i];
+  }
+
+  var origin;
+  if(prevRes){
+    var prevCust = custs.find(function(c){ return c.id===prevRes.customerId; });
+    origin = prevRes.address || (prevCust && prevCust.address) || HOME;
+  } else {
+    origin = HOME;
+  }
+
+  var url = 'https://www.google.com/maps/dir/'+encodeURIComponent(origin)+'/'+encodeURIComponent(dest);
+  window.open(url, '_blank');
+};
+
 window.delRes = function(id){
   if(!confirm('この予約を削除しますか？')) return;
   saveReservations(loadReservations().filter(function(r){ return r.id!==id; }));
@@ -500,6 +553,7 @@ document.getElementById('res-modal-save').addEventListener('click', function(){
     menu: document.getElementById('res-menu').value,
     status: document.getElementById('res-status').value,
     notes: document.getElementById('res-notes').value.trim(),
+    address: document.getElementById('res-address').value.trim(),
     createdAt: id ? (res.find(function(r){return r.id===id;})||{}).createdAt : new Date().toISOString()
   };
   if(id){ saveReservations(res.map(function(r){ return r.id===id?obj:r; })); }
