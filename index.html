@@ -3,6 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function(){
+  var KEY='kao_auth', PW='kao0421';
+  if(sessionStorage.getItem(KEY)!=='1'){
+    document.addEventListener('DOMContentLoaded',function(){
+      var overlay=document.getElementById('pw-overlay');
+      overlay.style.display='flex';
+      document.getElementById('pw-form').addEventListener('submit',function(e){
+        e.preventDefault();
+        if(document.getElementById('pw-input').value===PW){
+          sessionStorage.setItem(KEY,'1');
+          overlay.style.opacity='0';
+          overlay.style.transition='opacity .5s';
+          setTimeout(function(){overlay.remove();},500);
+        } else {
+          var err=document.getElementById('pw-err');
+          err.style.opacity='1';
+          document.getElementById('pw-input').value='';
+          document.getElementById('pw-input').focus();
+        }
+      });
+    });
+  }
+})();
+</script>
 <title>kao 訪問美容 — 海辺の出張美容</title>
 <meta name="description" content="逗子・葉山・鎌倉へ伺う訪問ヘアスタイリング。サロンに行けない方のもとへ、笑顔を届けます。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -395,6 +420,19 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
 </style>
 </head>
 <body>
+<div id="pw-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(248,246,244,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;flex-direction:column;gap:32px;">
+  <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px;padding:0 32px;">
+    <img src="assets/kao-logo.png" alt="kao 訪問美容" style="height:72px;width:auto;opacity:.9;">
+    <p style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;letter-spacing:.28em;color:#8ABBC2;text-transform:uppercase;">Preview Access</p>
+    <form id="pw-form" style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:280px;">
+      <input id="pw-input" type="password" placeholder="パスワードを入力" autocomplete="current-password"
+        style="width:100%;height:52px;border:1.5px solid #A8DDE4;border-radius:4px;background:#fff;text-align:center;font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.18em;color:#2C3E42;outline:none;padding:0 16px;">
+      <p id="pw-err" style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:#F4C5BA;letter-spacing:.08em;opacity:0;transition:opacity .3s;">パスワードが違います</p>
+      <button type="submit"
+        style="width:100%;height:48px;background:#5BAEBC;color:#fff;border:none;border-radius:999px;font-family:'Josefin Sans',sans-serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;">Enter</button>
+    </form>
+  </div>
+</div>
 <header id="hdr">
   <div class="bar">
     <a class="logo" href="#top" aria-label="kao 訪問美容 ホーム">
