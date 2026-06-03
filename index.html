@@ -143,6 +143,13 @@ header.solid .bar{padding:14px 32px;}
 .logo{display:flex;align-items:center;cursor:pointer;}
 .logo img{height:54px;width:auto;display:block;transition:height .5s var(--ease);filter:drop-shadow(0 1px 2px rgba(255,255,255,.85)) drop-shadow(0 2px 10px rgba(248,246,244,.6));}
 header.solid .logo img{height:44px;}
+.logo-tagline{
+  font-family:var(--jp);font-size:13px;font-weight:400;
+  letter-spacing:.28em;color:var(--ocean);
+  border-left:1.5px solid var(--ocean);padding-left:14px;margin-left:14px;
+  white-space:nowrap;line-height:1;
+}
+header.solid .logo-tagline{font-size:12px;}
 /* nav */
 nav.main{display:flex;align-items:center;gap:38px;}
 nav.main a.link{
@@ -402,6 +409,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
   .bar{padding:16px 22px;}
   .logo img{height:46px;}
   header.solid .logo img{height:40px;}
+  .logo-tagline{font-size:11px;padding-left:10px;margin-left:10px;}
   header.solid .bar{padding:13px 22px;}
   .menu-grid{grid-template-columns:1fr;}
   .gal-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px;}
@@ -437,6 +445,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
   <div class="bar">
     <a class="logo" href="#top" aria-label="kao 訪問美容 ホーム">
       <img src="assets/kao-logo.png" alt="kao 訪問美容 — hair stylist">
+      <span class="logo-tagline">訪問美容</span>
     </a>
     <nav class="main" aria-label="メインナビゲーション">
       <a class="link" href="#concept">Concept</a>
