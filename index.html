@@ -374,6 +374,10 @@ nav.main a.link:hover::after{right:0;}
 .reserve .phone{display:inline-block;margin-top:18px;font-family:var(--en);font-style:italic;font-size:28px;color:#fff;letter-spacing:.04em;transition:opacity .3s var(--ease);}
 .reserve a.phone:hover{opacity:.78;}
 .reserve .hours{font-size:14.5px;color:rgba(255,255,255,.92);letter-spacing:.08em;line-height:1.9;}
+.line-qr a{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.9;transition:opacity .3s;}
+.line-qr a:hover{opacity:1;}
+.line-qr img{border-radius:10px;background:#fff;padding:8px;}
+.line-qr span{font-size:12px;color:rgba(255,255,255,.8);letter-spacing:.08em;}
 
 /* ---------- about ---------- */
 .about{background:var(--sand);}
@@ -670,7 +674,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       <p class="r-lede reveal d2">ご予約・ご相談はお気軽に。ご本人さま、ご家族さま、施設のご担当者さまからのお問い合わせも歓迎しております。日程と内容をお伺いし、当日伺います。</p>
       <div class="insurance-badge reveal d2"><span class="ins-icon">🛡</span><span>損害賠償保険加入済み</span></div>
       <div class="contact-row reveal d3">
-        <a class="cbtn primary" href="#" onclick="return false;">
+        <a class="cbtn primary" href="https://line.me/R/ti/p/@516svwik" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 5.6 2 10c0 2.5 1.4 4.7 3.7 6.2-.2.7-.7 2.4-.8 2.8 0 0-.02.2.1.27.13.08.28 0 .28 0 .37-.05 2.4-1.6 3.3-2.25.4.06.9.1 1.4.1 5.5 0 10-3.6 10-8S17.5 2 12 2z"/></svg>
           LINEで予約・相談
         </a>
@@ -678,12 +682,14 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L20 18v-4l-5-2 0 0"/><path d="M4 4c0 8 8 16 16 16"/></svg>
           お電話
         </a>
-        <a class="cbtn ghost" href="mailto:hello@kao-visit.com">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
-          メール
-        </a>
       </div>
       <a class="phone reveal d4" href="tel:09047557741">090 - 4755 - 7741</a>
+      <div class="line-qr reveal d4">
+        <a href="https://line.me/R/ti/p/@516svwik" target="_blank" rel="noopener">
+          <img src="assets/line-qr.png" alt="LINE QRコード" width="120" height="120">
+          <span>QRコードを読み取って友だち追加</span>
+        </a>
+      </div>
       <div class="hours reveal d4">受付　9:00 – 18:00　／　定休日　土日祝日<br><small style="font-size:.85em;opacity:.8;">定休日でもご予約をお受け出来る場合がありますのでお気軽にお問い合わせください</small></div>
     </div>
   </div>
@@ -739,9 +745,8 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
         </div>
         <div class="foot-col">
           <span class="ti">Contact</span>
-          <a href="#reserve">LINEで予約・相談</a>
+          <a href="https://line.me/R/ti/p/@516svwik" target="_blank" rel="noopener">LINEで予約・相談</a>
           <a href="tel:09047557741">お電話 090-4755-7741</a>
-          <a href="mailto:hello@kao-visit.com">メール</a>
           <span>9:00 – 18:00 / 定休日　土日祝日</span>
         </div>
       </div>
