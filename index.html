@@ -598,14 +598,14 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       <article class="card reveal d1">
         <div class="no">02</div>
         <div class="en">Cut &amp; Color</div>
-        <div class="ja">カット&amp;カラー <span class="incl-badge">シャンプー込</span></div>
+        <div class="ja">カット&amp;カラー</div>
         <p class="desc">白髪染め・おしゃれ染め。頭皮にやさしい低刺激カラーを使用します。</p>
         <div class="price"><span class="yen">¥11,000</span></div>
       </article>
       <article class="card reveal d2">
         <div class="no">03</div>
         <div class="en">Cut &amp; Perm</div>
-        <div class="ja">カット&amp;パーマ <span class="incl-badge">シャンプー込</span></div>
+        <div class="ja">カット&amp;パーマ</div>
         <p class="desc">ナチュラルからしっかりカールまで。ダメージを抑えた薬剤で。</p>
         <div class="price"><span class="yen">¥12,100</span></div>
       </article>
@@ -733,9 +733,8 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
               <input type="tel" name="phone" placeholder="090-0000-0000" required>
             </div>
             <div class="f-group">
-              <label>ご希望メニュー<span class="req">*</span></label>
-              <select name="menu" required>
-                <option value="">選択してください</option>
+              <label>ご希望メニュー（複数選択可）<span class="req">*</span></label>
+              <select name="menu" multiple required size="4">
                 <option value="カット&ブロー ¥5,500">カット&ブロー ¥5,500</option>
                 <option value="カット&カラー ¥11,000">カット&カラー ¥11,000</option>
                 <option value="カット&パーマ ¥12,100">カット&パーマ ¥12,100</option>
@@ -911,7 +910,18 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     var btn = document.getElementById('form-submit-btn');
     var msg = document.getElementById('form-msg');
     var data = {};
-    new FormData(form).forEach(function(v,k){ data[k] = v; });
+    var fd = new FormData(form);
+    fd.forEach(function(v,k){
+      if(k === 'menu'){
+        if(!data[k]) data[k] = [];
+        data[k].push(v);
+      } else {
+        data[k] = v;
+      }
+    });
+    if(Array.isArray(data.menu)){
+      data.menu = data.menu.join('、');
+    }
     btn.disabled = true;
     btn.textContent = '送信中...';
     msg.style.display = 'none';
