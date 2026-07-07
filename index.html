@@ -393,6 +393,10 @@ nav.main a.link:hover::after{right:0;}
 .f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--dawn);background:rgba(255,255,255,.18);}
 .f-group textarea{resize:vertical;min-height:76px;}
 .f-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,.5)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;}
+.f-checkbox-group{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+.f-checkbox-item{display:flex;align-items:center;gap:10px;}
+.f-checkbox-item input[type="checkbox"]{width:18px;height:18px;cursor:pointer;accent-color:var(--dawn);}
+.f-checkbox-item label{cursor:pointer;margin:0;color:rgba(255,255,255,.9);}
 .form-submit-btn{width:100%;height:50px;background:var(--dawn);color:var(--ink);border:none;border-radius:999px;font-family:var(--label);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;margin-top:22px;transition:all .3s;cursor:pointer;}
 .form-submit-btn:hover{background:#eabdb0;transform:translateY(-2px);}
 .form-submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
@@ -594,6 +598,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
         <div class="ja">カット&amp;ブロー</div>
         <p class="desc">お一人おひとりの髪質を活かし、扱いやすく似合うかたちへ。</p>
         <div class="price"><span class="yen">¥5,500</span></div>
+        <div class="subnote">ベットの上での施術は＋¥1,100</div>
       </article>
       <article class="card reveal d1">
         <div class="no">02</div>
@@ -734,12 +739,28 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
             </div>
             <div class="f-group">
               <label>ご希望メニュー（複数選択可）<span class="req">*</span></label>
-              <select name="menu" multiple required size="4">
-                <option value="カット&ブロー ¥5,500">カット&ブロー ¥5,500</option>
-                <option value="カット&カラー ¥11,000">カット&カラー ¥11,000</option>
-                <option value="カット&パーマ ¥12,100">カット&パーマ ¥12,100</option>
-                <option value="シャンプー ¥1,100">シャンプー ¥1,100</option>
-              </select>
+              <div class="f-checkbox-group">
+                <div class="f-checkbox-item">
+                  <input type="checkbox" id="menu1" name="menu" value="カット&ブロー ¥5,500">
+                  <label for="menu1">カット&ブロー ¥5,500</label>
+                </div>
+                <div class="f-checkbox-item">
+                  <input type="checkbox" id="menu2" name="menu" value="カット&ブロー(ベット上での施術) ¥6,600">
+                  <label for="menu2">カット&ブロー(ベット上での施術) ¥6,600</label>
+                </div>
+                <div class="f-checkbox-item">
+                  <input type="checkbox" id="menu3" name="menu" value="カット&カラー ¥11,000">
+                  <label for="menu3">カット&カラー ¥11,000</label>
+                </div>
+                <div class="f-checkbox-item">
+                  <input type="checkbox" id="menu4" name="menu" value="カット&パーマ ¥12,100">
+                  <label for="menu4">カット&パーマ ¥12,100</label>
+                </div>
+                <div class="f-checkbox-item">
+                  <input type="checkbox" id="menu5" name="menu" value="シャンプー ¥1,100">
+                  <label for="menu5">シャンプー ¥1,100</label>
+                </div>
+              </div>
             </div>
           </div>
           <div class="f-row" style="margin-top:14px;">
