@@ -618,7 +618,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
         <div class="no">04</div>
         <div class="en">Shampoo</div>
         <div class="ja">シャンプー</div>
-        <p class="desc">前かがみが可能な方に限ります。ご自宅の洗面台・浴室などをお借りして施術させていただきます。</p>
+        <p class="desc">ご自宅の洗面台・浴室などをお借りして施術させていただきます。</p>
         <div class="price"><span class="yen">¥1,100</span></div>
       </article>
     </div>
@@ -788,8 +788,29 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
             <input type="text" name="address" placeholder="神奈川県逗子市〇〇〇" required>
           </div>
           <div class="f-group full" style="margin-top:14px;">
-            <label>ご要望・メモ</label>
-            <textarea name="notes" placeholder="アレルギー・体調・ご要望などをご記入ください"></textarea>
+            <label>普段の姿勢について<span class="req">*</span></label>
+            <div class="f-checkbox-group">
+              <div class="f-checkbox-item">
+                <input type="checkbox" id="posture1" name="posture" value="ご自身で歩くことができ椅子に座っていられる">
+                <label for="posture1">ご自身で歩くことができ椅子に座っていられる</label>
+              </div>
+              <div class="f-checkbox-item">
+                <input type="checkbox" id="posture2" name="posture" value="介助があれば椅子に座っていられる">
+                <label for="posture2">介助があれば椅子に座っていられる</label>
+              </div>
+              <div class="f-checkbox-item">
+                <input type="checkbox" id="posture3" name="posture" value="車椅子で施術を受けられる">
+                <label for="posture3">車椅子で施術を受けられる</label>
+              </div>
+              <div class="f-checkbox-item">
+                <input type="checkbox" id="posture4" name="posture" value="ベッド上（寝たまま）での施術を希望">
+                <label for="posture4">ベッド上（寝たまま）での施術を希望</label>
+              </div>
+            </div>
+          </div>
+          <div class="f-group full" style="margin-top:14px;">
+            <label>ご要望</label>
+            <textarea name="notes" placeholder="ご要望やご相談がございましたら、お気軽にご記入ください"></textarea>
           </div>
           <button type="submit" class="form-submit-btn" id="form-submit-btn">送信する</button>
           <div id="form-msg" class="form-msg"></div>
