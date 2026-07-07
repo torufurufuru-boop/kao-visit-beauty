@@ -184,8 +184,11 @@ tbody tr:hover{background:var(--sand);}
   <div class="tab-panel active" id="panel-reservations">
     <div id="res-stats" class="stats"></div>
     <div class="sec-header">
-      <span class="sec-title">予約一覧</span>
-      <button class="btn btn-primary" id="res-add-btn">＋ 予約を追加</button>
+      <span class="sec-title">予約一覧　<span id="sheets-badge" style="font-size:11px;background:var(--ocean-ll);color:var(--deep);padding:3px 10px;border-radius:999px;letter-spacing:.06em;"></span></span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-ghost btn-sm" onclick="fetchSheetsReservations()" title="サイトからの予約を再読み込み">↻ 更新</button>
+        <button class="btn btn-primary" id="res-add-btn">＋ 予約を追加</button>
+      </div>
     </div>
     <div class="tbl-wrap">
       <table id="res-table">
@@ -375,11 +378,44 @@ document.getElementById('logout-btn').addEventListener('click', function(){
 
 /* ===== DATA ===== */
 var CUST_KEY = 'kao_customers', RES_KEY = 'kao_reservations';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNSvTb2fzGlDU5wPr7TR608LBnTYhcw5E9VwM491BnEvWd_rDSnkgOMBeCFVcn0GIdtA/exec';
+var sheetsReservations = [];
 
 function loadCustomers(){ try{ return JSON.parse(localStorage.getItem(CUST_KEY)||'[]'); }catch(e){ return []; } }
 function saveCustomers(d){ localStorage.setItem(CUST_KEY, JSON.stringify(d)); }
 function loadReservations(){ try{ return JSON.parse(localStorage.getItem(RES_KEY)||'[]'); }catch(e){ return []; } }
 function saveReservations(d){ localStorage.setItem(RES_KEY, JSON.stringify(d)); }
+
+function fetchSheetsReservations(){
+  var badge = document.getElementById('sheets-badge');
+  if(badge) badge.textContent = '読込中...';
+  fetch(SCRIPT_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res.success){
+        sheetsReservations = (res.data||[]).map(function(row){
+          return {
+            id: 'gs_'+row.rowIndex,
+            source: 'sheets',
+            date: row['ご希望日']||'',
+            time: row['ご希望時間']||'',
+            customerName: row['お名前']||'',
+            kana: row['ふりがな']||'',
+            phone: row['電話番号']||'',
+            menu: row['メニュー']||'',
+            address: row['ご住所']||'',
+            notes: row['ご要望']||'',
+            status: row['ステータス']||'未確認',
+            receivedAt: row['受付日時']||'',
+            rowIndex: row.rowIndex
+          };
+        });
+        if(badge) badge.textContent = sheetsReservations.length+'件';
+        renderReservations();
+      }
+    })
+    .catch(function(){ if(badge) badge.textContent = 'オフライン'; });
+}
 
 function uid(){
   return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
@@ -421,27 +457,32 @@ function stat(v,l){ return '<div class="stat-card"><div class="sv">'+v+'</div><d
 
 function renderReservations(){
   renderStats();
-  var res = loadReservations().slice().sort(function(a,b){ return a.date>b.date?1:a.date<b.date?-1:0; });
+  var local = loadReservations();
+  var all = local.concat(sheetsReservations).slice().sort(function(a,b){ return a.date>b.date?1:a.date<b.date?-1:0; });
   var custs = loadCustomers();
   var tbody = document.getElementById('res-tbody');
-  if(!res.length){
+  if(!all.length){
     tbody.innerHTML = '<tr class="empty-row"><td colspan="7">予約がまだありません</td></tr>';
     return;
   }
-  tbody.innerHTML = res.map(function(r){
+  tbody.innerHTML = all.map(function(r){
     var cust = custs.find(function(c){ return c.id === r.customerId; });
     var name = cust ? cust.name : (r.customerName||'—');
+    var isSheets = r.source === 'sheets';
+    var statusLabel = isSheets ? r.status : (STATUS_LABEL[r.status]||r.status);
+    var statusClass = isSheets ? (r.status==='未確認'?'badge-pending':'badge-confirmed') : (STATUS_CLASS[r.status]||'badge-pending');
+    var sourceBadge = isSheets ? '<span style="font-size:10px;background:#e8f5e9;color:#2e7d32;border-radius:3px;padding:1px 5px;margin-left:4px;">WEB</span>' : '';
     return '<tr>'+
       '<td>'+fmtDate(r.date)+'</td>'+
       '<td>'+fmtTime(r.time)+'</td>'+
-      '<td>'+esc(name)+'</td>'+
+      '<td>'+esc(name)+sourceBadge+'</td>'+
       '<td>'+esc(r.menu||'—')+'</td>'+
-      '<td><span class="badge '+STATUS_CLASS[r.status]+'">'+STATUS_LABEL[r.status]+'</span></td>'+
+      '<td><span class="badge '+statusClass+'">'+statusLabel+'</span></td>'+
       '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted-d)">'+esc(r.notes||'')+'</td>'+
       '<td><div class="td-actions">'+
         '<button class="btn btn-map btn-sm" onclick="openMaps(\''+r.id+'\')" title="Googleマップでルートを開く">🗺 地図</button>'+
-        '<button class="btn btn-ghost btn-sm" onclick="editRes(\''+r.id+'\')">編集</button>'+
-        '<button class="btn btn-danger btn-sm" onclick="delRes(\''+r.id+'\')">削除</button>'+
+        (isSheets ? '' : '<button class="btn btn-ghost btn-sm" onclick="editRes(\''+r.id+'\')">編集</button>')+
+        (isSheets ? '' : '<button class="btn btn-danger btn-sm" onclick="delRes(\''+r.id+'\')">削除</button>')+
       '</div></td>'+
     '</tr>';
   }).join('');
@@ -754,6 +795,7 @@ function init(){
   renderReservations();
   renderCustomers();
   renderHistorySelect();
+  fetchSheetsReservations();
 }
 
 if(isAuthed()) init();

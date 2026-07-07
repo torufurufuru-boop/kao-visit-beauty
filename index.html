@@ -379,6 +379,29 @@ nav.main a.link:hover::after{right:0;}
 .line-qr img{border-radius:10px;background:#fff;padding:8px;}
 .line-qr span{font-size:12px;color:rgba(255,255,255,.8);letter-spacing:.08em;}
 
+/* ---------- reservation form ---------- */
+.res-form-wrap{margin-top:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:36px 32px;max-width:580px;width:100%;text-align:left;backdrop-filter:blur(6px);}
+.res-form-wrap h3{font-family:var(--jp-head);font-size:17px;font-weight:500;color:#fff;letter-spacing:.1em;margin-bottom:24px;text-align:center;}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.f-group{display:flex;flex-direction:column;gap:6px;}
+.f-group.full{grid-column:1/-1;}
+.f-group label{font-size:12px;letter-spacing:.1em;color:rgba(255,255,255,.72);}
+.f-group label .req{color:var(--dawn);margin-left:3px;}
+.f-group input,.f-group select,.f-group textarea{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:10px 13px;color:#fff;font-size:14px;outline:none;transition:border-color .3s;width:100%;}
+.f-group select option{color:var(--ink);background:#fff;}
+.f-group input::placeholder,.f-group textarea::placeholder{color:rgba(255,255,255,.38);}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--dawn);background:rgba(255,255,255,.18);}
+.f-group textarea{resize:vertical;min-height:76px;}
+.f-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,.5)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;}
+.form-submit-btn{width:100%;height:50px;background:var(--dawn);color:var(--ink);border:none;border-radius:999px;font-family:var(--label);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;margin-top:22px;transition:all .3s;cursor:pointer;}
+.form-submit-btn:hover{background:#eabdb0;transform:translateY(-2px);}
+.form-submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.form-note{font-size:12px;color:rgba(255,255,255,.56);text-align:center;margin-top:14px;letter-spacing:.06em;}
+.form-msg{margin-top:14px;padding:12px 18px;border-radius:6px;font-size:13px;text-align:center;letter-spacing:.05em;display:none;}
+.form-msg.ok{background:rgba(91,174,188,.25);color:#fff;border:1px solid rgba(91,174,188,.45);}
+.form-msg.err{background:rgba(244,197,186,.15);color:var(--dawn);border:1px solid rgba(244,197,186,.35);}
+@media(max-width:540px){.f-row{grid-template-columns:1fr;}.res-form-wrap{padding:28px 20px;}}
+
 /* ---------- about ---------- */
 .about{background:var(--sand);}
 .about-grid{display:grid;grid-template-columns:0.85fr 1fr;gap:72px;align-items:center;}
@@ -495,7 +518,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
   </div>
   <div class="slide">
     <div class="ph" style="width:100%;height:100%;" data-ph="Hero — おだやかな時間">
-            <img alt="訪問美容のひとこま" data-src="assets/b0551c32-04fa-470e-b14b-26b662da5d69.jpeg">
+      <img alt="訪問美容のひとこま" data-src="assets/b0551c32-04fa-470e-b14b-26b662da5d69.jpeg">
     </div>
   </div>
   <div class="scrim"></div>
@@ -690,6 +713,69 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
         </a>
       </div>
       <div class="hours reveal d4">受付　9:00 – 18:00　／　定休日　土日祝日<br><small style="font-size:.85em;opacity:.8;">定休日でもご予約をお受け出来る場合がありますのでお気軽にお問い合わせください</small></div>
+
+      <div class="res-form-wrap reveal d4">
+        <h3>ご予約フォーム</h3>
+        <form id="res-form">
+          <div class="f-row">
+            <div class="f-group">
+              <label>お名前<span class="req">*</span></label>
+              <input type="text" name="name" placeholder="山田 花子" required>
+            </div>
+            <div class="f-group">
+              <label>ふりがな<span class="req">*</span></label>
+              <input type="text" name="kana" placeholder="やまだ はなこ" required>
+            </div>
+          </div>
+          <div class="f-row" style="margin-top:14px;">
+            <div class="f-group">
+              <label>電話番号<span class="req">*</span></label>
+              <input type="tel" name="phone" placeholder="090-0000-0000" required>
+            </div>
+            <div class="f-group">
+              <label>ご希望メニュー<span class="req">*</span></label>
+              <select name="menu" required>
+                <option value="">選択してください</option>
+                <option value="カット&ブロー ¥5,500">カット&ブロー ¥5,500</option>
+                <option value="カット&カラー ¥11,000">カット&カラー ¥11,000</option>
+                <option value="カット&パーマ ¥12,100">カット&パーマ ¥12,100</option>
+                <option value="シャンプー ¥1,100">シャンプー ¥1,100</option>
+              </select>
+            </div>
+          </div>
+          <div class="f-row" style="margin-top:14px;">
+            <div class="f-group">
+              <label>ご希望日<span class="req">*</span></label>
+              <input type="date" name="date" required>
+            </div>
+            <div class="f-group">
+              <label>ご希望時間<span class="req">*</span></label>
+              <select name="time" required>
+                <option value="">選択してください</option>
+                <option value="9:00">9:00</option>
+                <option value="10:00">10:00</option>
+                <option value="11:00">11:00</option>
+                <option value="13:00">13:00</option>
+                <option value="14:00">14:00</option>
+                <option value="15:00">15:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+              </select>
+            </div>
+          </div>
+          <div class="f-group full" style="margin-top:14px;">
+            <label>ご住所<span class="req">*</span></label>
+            <input type="text" name="address" placeholder="神奈川県逗子市〇〇〇" required>
+          </div>
+          <div class="f-group full" style="margin-top:14px;">
+            <label>ご要望・メモ</label>
+            <textarea name="notes" placeholder="アレルギー・体調・ご要望などをご記入ください"></textarea>
+          </div>
+          <button type="submit" class="form-submit-btn" id="form-submit-btn">送信する</button>
+          <div id="form-msg" class="form-msg"></div>
+          <p class="form-note">※ ご予約確定後、お電話にてご連絡いたします。</p>
+        </form>
+      </div>
     </div>
   </div>
 </section>
@@ -812,6 +898,43 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
   }
 
+})();
+</script>
+<script>
+/* ---------- reservation form submission ---------- */
+(function(){
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNSvTb2fzGlDU5wPr7TR608LBnTYhcw5E9VwM491BnEvWd_rDSnkgOMBeCFVcn0GIdtA/exec';
+  var form = document.getElementById('res-form');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var btn = document.getElementById('form-submit-btn');
+    var msg = document.getElementById('form-msg');
+    var data = {};
+    new FormData(form).forEach(function(v,k){ data[k] = v; });
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+    msg.style.display = 'none';
+    fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(data) })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if(res.success){
+          msg.className = 'form-msg ok';
+          msg.textContent = 'ご予約を受け付けました。確認のご連絡をさしあげます。';
+          msg.style.display = 'block';
+          form.reset();
+        } else { throw new Error(); }
+      })
+      .catch(function(){
+        msg.className = 'form-msg err';
+        msg.textContent = '送信に失敗しました。お電話またはLINEでご連絡ください。';
+        msg.style.display = 'block';
+      })
+      .finally(function(){
+        btn.disabled = false;
+        btn.textContent = '送信する';
+      });
+  });
 })();
 </script>
 </body>
