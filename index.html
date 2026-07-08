@@ -773,15 +773,6 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
             </div>
           </div>
 
-          <div class="mini-calendar" style="margin:18px 0;">
-            <div class="cal-nav-mini">
-              <button class="cal-prev-mini">←</button>
-              <div class="cal-month-year-mini" id="calMonthYearMini"></div>
-              <button class="cal-next-mini">→</button>
-            </div>
-            <div class="calendar-grid-mini" id="calendarGridMini"></div>
-          </div>
-
           <div class="f-row" style="margin-top:14px;">
             <div class="f-group">
               <label>ご希望メニュー（複数選択可）<span class="req">*</span></label>
@@ -807,6 +798,18 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
                   <label for="menu5">シャンプー ¥1,100</label>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <label style="display:block;margin-bottom:10px;font-weight:500;color:#243237;">ご予約可能日<span class="req">*</span></label>
+            <div class="mini-calendar" style="margin:8px 0;">
+              <div class="cal-nav-mini">
+                <button class="cal-prev-mini">←</button>
+                <div class="cal-month-year-mini" id="calMonthYearMini"></div>
+                <button class="cal-next-mini">→</button>
+              </div>
+              <div class="calendar-grid-mini" id="calendarGridMini"></div>
             </div>
           </div>
           <div class="f-row" style="margin-top:14px;">
@@ -1393,9 +1396,9 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           cell.dataset.date = dateStr;
           cell.addEventListener('click', function(e) {
             var date = e.target.dataset.date;
-            var selectedInput = document.querySelector('input[name="希望日"]');
+            var selectedInput = document.querySelector('input[name="date"]');
             if (selectedInput) {
-              selectedInput.value = date.replace(/-/g, '/');
+              selectedInput.value = date;
               selectedInput.focus();
               selectedInput.scrollIntoView({ behavior: 'smooth' });
             }
