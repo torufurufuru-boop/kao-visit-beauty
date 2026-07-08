@@ -379,6 +379,21 @@ nav.main a.link:hover::after{right:0;}
 .legend-box.unavailable{background:#e0e0e0;}
 .legend-box.partial{background:var(--dawn-l);border-color:var(--dawn);}
 
+/* ---------- mini calendar ---------- */
+.mini-calendar{margin:24px 0;padding:12px;background:#fff;border-radius:8px;}
+.cal-nav-mini{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;}
+.cal-nav-mini button{background:var(--ocean);color:#fff;border:none;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer;transition:.2s;}
+.cal-nav-mini button:hover{background:var(--deep);}
+.cal-month-year-mini{font-size:13px;font-weight:600;color:var(--ink);}
+.calendar-grid-mini{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.calendar-grid-mini .day-header{font-weight:600;color:var(--deep);font-size:11px;padding:4px 0;text-align:center;}
+.calendar-grid-mini .day-cell{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:11px;cursor:pointer;transition:.2s;border:1px solid transparent;}
+.calendar-grid-mini .day-cell.available{background:var(--ocean-ll);color:var(--deep);border-color:var(--ocean);font-weight:600;}
+.calendar-grid-mini .day-cell.available:hover{background:var(--ocean-l);}
+.calendar-grid-mini .day-cell.unavailable{background:#e0e0e0;color:#999;cursor:not-allowed;}
+.calendar-grid-mini .day-cell.partial{background:var(--dawn-l);color:var(--deep);border-color:var(--dawn);}
+.calendar-grid-mini .day-cell.empty{background:transparent;}
+
 /* ---------- reserve ---------- */
 .reserve{background:var(--deep);color:#fff;position:relative;overflow:hidden;text-align:center;}
 .reserve::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(91,174,188,.4),transparent 55%),radial-gradient(circle at 85% 90%,rgba(244,197,186,.28),transparent 50%);}
@@ -718,42 +733,6 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
   </div>
 </section>
 
-<!-- ========== AVAILABILITY CALENDAR ========== -->
-<section class="calendar pad" id="calendar">
-  <div class="wrap">
-    <div class="inner">
-      <div class="eyebrow center reveal">Availability</div>
-      <h2 class="section-en reveal d1" style="font-family:var(--jp-head);font-style:normal;font-size:clamp(30px,4.4vw,52px);line-height:1.55;letter-spacing:.06em;">予約可能日</h2>
-      <p class="cal-lede reveal d2">下記カレンダーから予約可能な日付をご確認ください。自転車での移動時間を考慮した予約管理を行っています。</p>
-
-      <div class="calendar-container reveal d3">
-        <div class="calendar-nav">
-          <button class="cal-prev">← 前月</button>
-          <div class="cal-month-year" id="calMonthYear"></div>
-          <button class="cal-next">次月 →</button>
-        </div>
-
-        <div class="calendar-grid" id="calendarGrid"></div>
-
-        <div class="calendar-legend">
-          <div class="legend-item">
-            <span class="legend-box available"></span>
-            <span>予約可能</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-box unavailable"></span>
-            <span>予約不可</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-box partial"></span>
-            <span>一部予約可</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ========== RESERVE ========== -->
 <section class="reserve pad" id="reserve">
   <div class="wrap">
@@ -773,6 +752,16 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
         </a>
       </div>
       <a class="phone reveal d4" href="tel:09047557741">090 - 4755 - 7741</a>
+
+      <div class="mini-calendar reveal d4">
+        <div class="cal-nav-mini">
+          <button class="cal-prev-mini">←</button>
+          <div class="cal-month-year-mini" id="calMonthYearMini"></div>
+          <button class="cal-next-mini">→</button>
+        </div>
+        <div class="calendar-grid-mini" id="calendarGridMini"></div>
+      </div>
+
       <div class="line-qr reveal d4">
         <a href="https://line.me/R/ti/p/@516svwik" target="_blank" rel="noopener">
           <img src="assets/line-qr.png" alt="LINE QRコード" width="120" height="120">
@@ -1272,12 +1261,14 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
 
       if (availability !== 'unavailable') {
         cell.style.cursor = 'pointer';
-        cell.addEventListener('click', function() {
+        cell.dataset.date = dateStr;
+        cell.addEventListener('click', function(e) {
+          var date = e.target.dataset.date;
           var selectedInput = document.querySelector('input[name="希望日"]');
           if (selectedInput) {
-            selectedInput.value = dateStr.replace(/-/g, '/');
+            selectedInput.value = date.replace(/-/g, '/');
             selectedInput.focus();
-            document.querySelector('input[name="希望日"]').scrollIntoView({ behavior: 'smooth' });
+            selectedInput.scrollIntoView({ behavior: 'smooth' });
           }
         });
       }
@@ -1319,6 +1310,100 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     }
 
     fetchReservations();
+
+    // Mini calendar in form
+    var prevBtnMini = document.querySelector('.cal-prev-mini');
+    var nextBtnMini = document.querySelector('.cal-next-mini');
+
+    if (prevBtnMini) {
+      prevBtnMini.addEventListener('click', function() {
+        var today = new Date();
+        var prevMonth = new Date(currentMonth);
+        prevMonth.setMonth(prevMonth.getMonth() - 1);
+
+        if (prevMonth.getFullYear() > today.getFullYear() ||
+            (prevMonth.getFullYear() === today.getFullYear() && prevMonth.getMonth() >= today.getMonth())) {
+          currentMonth = prevMonth;
+          renderCalendarMini();
+        }
+      });
+    }
+
+    if (nextBtnMini) {
+      nextBtnMini.addEventListener('click', function() {
+        var today = new Date();
+        var maxMonth = new Date(today.getFullYear(), today.getMonth() + 3, 1);
+        var nextMonth = new Date(currentMonth);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        if (nextMonth <= maxMonth) {
+          currentMonth = nextMonth;
+          renderCalendarMini();
+        }
+      });
+    }
+
+    function renderCalendarMini() {
+      var year = currentMonth.getFullYear();
+      var month = currentMonth.getMonth();
+
+      document.getElementById('calMonthYearMini').textContent = year + '年 ' + (month + 1) + '月';
+
+      var firstDay = new Date(year, month, 1).getDay();
+      var lastDate = new Date(year, month + 1, 0).getDate();
+      var grid = document.getElementById('calendarGridMini');
+      grid.innerHTML = '';
+
+      var dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+      dayNames.forEach(function(name) {
+        var h = document.createElement('div');
+        h.className = 'day-header';
+        h.textContent = name;
+        grid.appendChild(h);
+      });
+
+      for (var i = 0; i < firstDay; i++) {
+        var empty = document.createElement('div');
+        empty.className = 'day-cell empty';
+        grid.appendChild(empty);
+      }
+
+      var today = new Date();
+      for (var d = 1; d <= lastDate; d++) {
+        var cell = document.createElement('div');
+        var cellDate = new Date(year, month, d);
+        var dateStr = formatDate(cellDate);
+
+        if (cellDate < today || dateStr < formatDate(new Date())) {
+          cell.className = 'day-cell unavailable';
+          cell.textContent = d;
+          grid.appendChild(cell);
+          continue;
+        }
+
+        var availability = isDayAvailable(dateStr);
+        cell.className = 'day-cell ' + availability;
+        cell.textContent = d;
+
+        if (availability !== 'unavailable') {
+          cell.style.cursor = 'pointer';
+          cell.dataset.date = dateStr;
+          cell.addEventListener('click', function(e) {
+            var date = e.target.dataset.date;
+            var selectedInput = document.querySelector('input[name="希望日"]');
+            if (selectedInput) {
+              selectedInput.value = date.replace(/-/g, '/');
+              selectedInput.focus();
+              selectedInput.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        }
+
+        grid.appendChild(cell);
+      }
+    }
+
+    renderCalendarMini();
   });
 })();
 </script>
