@@ -385,9 +385,9 @@ nav.main a.link:hover::after{right:0;}
 .cal-nav-mini button{background:var(--ocean);color:#fff;border:none;padding:6px 10px;border-radius:4px;font-size:12px;cursor:pointer;transition:.2s;}
 .cal-nav-mini button:hover{background:var(--deep);}
 .cal-month-year-mini{font-size:13px;font-weight:600;color:var(--ink);}
-.calendar-grid-mini{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.calendar-grid-mini{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
 .calendar-grid-mini .day-header{font-weight:600;color:var(--deep);font-size:11px;padding:4px 0;text-align:center;}
-.calendar-grid-mini .day-cell{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:11px;cursor:pointer;transition:.2s;border:1px solid transparent;}
+.calendar-grid-mini .day-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:11px;cursor:pointer;transition:.2s;border:1px solid transparent;}
 .calendar-grid-mini .day-cell.available{background:var(--ocean-ll);color:var(--deep);border-color:var(--ocean);font-weight:600;}
 .calendar-grid-mini .day-cell.available:hover{background:var(--ocean-l);}
 .calendar-grid-mini .day-cell.unavailable{background:#e0e0e0;color:#999;cursor:not-allowed;}
@@ -802,7 +802,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           </div>
 
           <div style="margin-top:14px;">
-            <label style="display:block;margin-bottom:10px;font-weight:500;color:#243237;">ご予約可能日<span class="req">*</span></label>
+            <label style="display:block;margin-bottom:10px;font-weight:500;color:#fff;">ご予約可能日<span class="req">*</span></label>
             <div class="mini-calendar" style="margin:8px 0;">
               <div class="cal-nav-mini">
                 <button class="cal-prev-mini">←</button>
@@ -1400,7 +1400,6 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
             if (selectedInput) {
               selectedInput.value = date;
               selectedInput.focus();
-              selectedInput.scrollIntoView({ behavior: 'smooth' });
             }
           });
         }
