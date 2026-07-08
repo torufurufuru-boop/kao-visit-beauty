@@ -401,7 +401,7 @@ function fetchSheetsReservations(){
           return {
             id: 'gs_'+row.rowIndex,
             source: 'sheets',
-            date: row['ご希望日']||'',
+            date: normDate(row['ご希望日']||''),
             time: row['ご希望時間']||'',
             customerName: row['お名前']||'',
             kana: row['ふりがな']||'',
@@ -465,6 +465,13 @@ function fmtTime(t){
   if(!t) return '—';
   if(t.includes('T')){ var h = new Date(t).getHours(); var m = new Date(t).getMinutes(); return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
   return t;
+}
+function normDate(v){
+  if(!v) return '';
+  var s = String(v);
+  var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
+  return s;
 }
 var STATUS_LABEL = { confirmed:'確定', tentative:'仮予約', completed:'完了', cancelled:'キャンセル' };
 var STATUS_CLASS = { confirmed:'badge-confirmed', tentative:'badge-tentative', completed:'badge-completed', cancelled:'badge-cancelled' };
