@@ -410,8 +410,25 @@ function fetchSheetsReservations(){
             rowIndex: row.rowIndex
           };
         });
+
+        // Add customers from sheets data
+        var custs = loadCustomers();
+        sheetsReservations.forEach(function(r){
+          if(r.customerName && !custs.find(function(c){ return c.phone === r.phone; })){
+            custs.push({
+              id: 'cust_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+              name: r.customerName,
+              kana: r.kana||'',
+              phone: r.phone||'',
+              address: r.address||''
+            });
+          }
+        });
+        saveCustomers(custs);
+
         if(badge) badge.textContent = sheetsReservations.length+'件';
         renderReservations();
+        renderCustomers();
       }
     })
     .catch(function(){ if(badge) badge.textContent = 'オフライン'; });
@@ -439,15 +456,20 @@ function fmtDate(d){
   var p = d.split('-');
   return p[0]+'年'+parseInt(p[1])+'月'+parseInt(p[2])+'日';
 }
-function fmtTime(t){ return t||'—'; }
+function fmtTime(t){
+  if(!t) return '—';
+  if(t.includes('T')){ var h = new Date(t).getHours(); var m = new Date(t).getMinutes(); return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
+  return t;
+}
 var STATUS_LABEL = { confirmed:'確定', tentative:'仮予約', completed:'完了', cancelled:'キャンセル' };
 var STATUS_CLASS = { confirmed:'badge-confirmed', tentative:'badge-tentative', completed:'badge-completed', cancelled:'badge-cancelled' };
 
 /* ===== RESERVATION TABLE ===== */
 function renderStats(){
   var res = loadReservations();
+  var all = res.concat(sheetsReservations);
   var today = new Date().toISOString().slice(0,10);
-  var upcoming = res.filter(function(r){ return r.date >= today && r.status !== 'cancelled'; }).length;
+  var upcoming = all.filter(function(r){ return r.date >= today && r.status !== 'cancelled'; }).length;
   var completed = res.filter(function(r){ return r.status === 'completed'; }).length;
   var custs = loadCustomers().length;
   document.getElementById('res-stats').innerHTML =
@@ -470,7 +492,7 @@ function renderReservations(){
     var name = cust ? cust.name : (r.customerName||'—');
     var isSheets = r.source === 'sheets';
     var statusLabel = isSheets ? r.status : (STATUS_LABEL[r.status]||r.status);
-    var statusClass = isSheets ? (r.status==='未確認'?'badge-pending':'badge-confirmed') : (STATUS_CLASS[r.status]||'badge-pending');
+    var statusClass = isSheets ? (r.status==='未確認'?'badge-tentative':'badge-confirmed') : (STATUS_CLASS[r.status]||'badge-pending');
     var sourceBadge = isSheets ? '<span style="font-size:10px;background:#e8f5e9;color:#2e7d32;border-radius:3px;padding:1px 5px;margin-left:4px;">WEB</span>' : '';
     return '<tr>'+
       '<td>'+fmtDate(r.date)+'</td>'+
@@ -481,8 +503,8 @@ function renderReservations(){
       '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted-d)">'+esc(r.notes||'')+'</td>'+
       '<td><div class="td-actions">'+
         '<button class="btn btn-map btn-sm" onclick="openMaps(\''+r.id+'\')" title="Googleマップでルートを開く">🗺 地図</button>'+
-        (isSheets ? '' : '<button class="btn btn-ghost btn-sm" onclick="editRes(\''+r.id+'\')">編集</button>')+
-        (isSheets ? '' : '<button class="btn btn-danger btn-sm" onclick="delRes(\''+r.id+'\')">削除</button>')+
+        '<button class="btn btn-ghost btn-sm" onclick="editRes(\''+r.id+'\')">編集</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="delRes(\''+r.id+'\')">削除</button>'+
       '</div></td>'+
     '</tr>';
   }).join('');
@@ -505,10 +527,16 @@ function openResModal(id){
   document.getElementById('res-modal-title').textContent = id ? '予約を編集' : '予約を追加';
   populateResCustomerSelect('');
   if(id){
-    var r = loadReservations().find(function(x){ return x.id===id; });
+    var r;
+    if(id.startsWith('gs_')){
+      r = sheetsReservations.find(function(x){ return x.id===id; });
+    } else {
+      r = loadReservations().find(function(x){ return x.id===id; });
+    }
+    if(!r) return;
     document.getElementById('res-id').value = r.id;
     document.getElementById('res-date').value = r.date||'';
-    document.getElementById('res-time').value = r.time||'10:00';
+    document.getElementById('res-time').value = (r.time && r.time.includes('T')) ? fmtTime(r.time) : (r.time||'10:00');
     document.getElementById('res-customer').value = r.customerId||'';
     document.getElementById('res-name').value = r.customerName||'';
     document.getElementById('res-menu').value = r.menu||'カット';
@@ -576,7 +604,11 @@ window.openMaps = function(id){
 
 window.delRes = function(id){
   if(!confirm('この予約を削除しますか？')) return;
-  saveReservations(loadReservations().filter(function(r){ return r.id!==id; }));
+  if(id.startsWith('gs_')){
+    sheetsReservations = sheetsReservations.filter(function(r){ return r.id!==id; });
+  } else {
+    saveReservations(loadReservations().filter(function(r){ return r.id!==id; }));
+  }
   renderReservations();
 };
 
@@ -597,8 +629,16 @@ document.getElementById('res-modal-save').addEventListener('click', function(){
     address: document.getElementById('res-address').value.trim(),
     createdAt: id ? (res.find(function(r){return r.id===id;})||{}).createdAt : new Date().toISOString()
   };
-  if(id){ saveReservations(res.map(function(r){ return r.id===id?obj:r; })); }
-  else { res.push(obj); saveReservations(res); }
+  if(id){
+    if(id.startsWith('gs_')){
+      sheetsReservations = sheetsReservations.map(function(r){ return r.id===id?Object.assign(r,obj):r; });
+    } else {
+      saveReservations(res.map(function(r){ return r.id===id?obj:r; }));
+    }
+  } else {
+    res.push(obj);
+    saveReservations(res);
+  }
   resBg.classList.remove('open');
   renderReservations();
 });
@@ -693,7 +733,7 @@ document.getElementById('cal-next').addEventListener('click', function(){
 function renderCalendar(){
   var MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   document.getElementById('cal-title').textContent = calYear+'年 '+MONTHS[calMonth];
-  var res = loadReservations().filter(function(r){ return r.status!=='cancelled'; });
+  var res = loadReservations().filter(function(r){ return r.status!=='cancelled'; }).concat(sheetsReservations.filter(function(r){ return r.status!=='cancelled'; }));
   var custs = loadCustomers();
   var today = new Date().toISOString().slice(0,10);
 
