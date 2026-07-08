@@ -433,7 +433,7 @@ function fetchSheetsReservations(){
         if(badge) badge.textContent = sheetsReservations.length+'件';
         renderReservations();
         renderCustomers();
-        if(document.querySelector('.tab-btn[data-tab="calendar"].active')) renderCalendar();
+        renderCalendar();
       }
     })
     .catch(function(){ if(badge) badge.textContent = 'オフライン'; });
@@ -784,19 +784,35 @@ function renderCalendar(){
         return;
       }
 
-      scheduleList.innerHTML = dayRes.map(function(r){
+      scheduleList.innerHTML = dayRes.map(function(r, idx){
         var c = custs.find(function(x){ return x.id===r.customerId; });
         var nm = c?c.name:(r.customerName||'—');
         var statusClass = r.source==='sheets'?(r.status==='未確認'?'badge-tentative':'badge-confirmed'):(STATUS_CLASS[r.status]||'badge-pending');
         var statusLabel = r.source==='sheets'?r.status:(STATUS_LABEL[r.status]||r.status);
         var sourceBadge = r.source==='sheets'?'<span style="font-size:10px;background:#e8f5e9;color:#2e7d32;border-radius:3px;padding:1px 5px;margin-left:4px;">WEB</span>':'';
+
+        // 移動情報の計算
+        var moveInfo = '';
+        if(idx === 0){
+          moveInfo = '<div style="color:#c0392b;font-size:12px;font-weight:500;margin-bottom:8px;">◆ 開始地点: 逗子市沼間4-4-19</div>';
+        } else {
+          var prevRes = dayRes[idx-1];
+          var prevC = custs.find(function(x){ return x.id===prevRes.customerId; });
+          var prevAddr = prevRes.address || (prevC && prevC.address) || '逗子市沼間4-4-19';
+          var currAddr = r.address || (c && c.address) || '—';
+          if(prevAddr && currAddr && prevAddr !== currAddr){
+            moveInfo = '<div style="color:#e67e22;font-size:12px;font-weight:500;margin-bottom:8px;">→ '+esc(prevAddr)+' から移動</div>';
+          }
+        }
+
         return '<div style="padding:12px;background:var(--sand);border-radius:6px;border-left:3px solid var(--ocean);">'+
+          moveInfo+
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
             '<span style="font-weight:600;color:var(--ocean);">'+fmtTime(r.time)+'</span>'+
             '<span class="badge '+statusClass+'">'+statusLabel+'</span>'+
           '</div>'+
           '<div style="color:var(--ink);font-weight:500;">'+esc(nm)+sourceBadge+'</div>'+
-          '<div style="color:var(--muted-d);font-size:13px;">'+esc(r.menu||'—')+'</div>'+
+          '<div style="color:var(--muted-d);font-size:13px;">'+esc(r.menu||'—')+' / '+esc(r.address||'—')+'</div>'+
           (r.notes?'<div style="color:var(--muted-d);font-size:12px;margin-top:6px;">メモ: '+esc(r.notes)+'</div>':'')+
         '</div>';
       }).join('');
