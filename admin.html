@@ -232,6 +232,10 @@ tbody tr:hover{background:var(--sand);}
       <div class="cal-dow">土</div>
     </div>
     <div class="cal-grid" id="cal-body"></div>
+    <div id="cal-schedule" style="margin-top:28px;padding:20px;background:#fff;border-radius:8px;border:1px solid var(--ocean-ll);display:none;">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:16px;color:var(--ink);">当日のスケジュール</h4>
+      <div id="cal-schedule-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
   </div>
 
   <!-- ===== 施術履歴 ===== -->
@@ -429,6 +433,7 @@ function fetchSheetsReservations(){
         if(badge) badge.textContent = sheetsReservations.length+'件';
         renderReservations();
         renderCustomers();
+        if(document.querySelector('.tab-btn[data-tab="calendar"].active')) renderCalendar();
       }
     })
     .catch(function(){ if(badge) badge.textContent = 'オフライン'; });
@@ -770,28 +775,33 @@ function renderCalendar(){
   document.querySelectorAll('.cal-cell[data-date]').forEach(function(cell){
     cell.addEventListener('click', function(){
       var ds = cell.dataset.date;
-      var dayRes = res.filter(function(r){ return r.date===ds; });
-      if(!dayRes.length) return;
-      var existing = document.querySelector('.cal-popup');
-      if(existing) existing.remove();
-      var popup = document.createElement('div');
-      popup.className = 'cal-popup';
-      popup.innerHTML = '<h4>'+fmtDate(ds)+'</h4>' +
-        dayRes.map(function(r){
-          var c = custs.find(function(x){ return x.id===r.customerId; });
-          var nm = c?c.name:(r.customerName||'—');
-          return '<div class="cal-popup-item">'+
-            '<span>'+fmtTime(r.time)+'</span>'+
-            '<span>'+esc(nm)+' / '+esc(r.menu)+'</span>'+
-          '</div>';
-        }).join('');
-      cell.style.position = 'relative';
-      cell.appendChild(popup);
-      setTimeout(function(){
-        document.addEventListener('click', function rem(e){
-          if(!popup.contains(e.target)){ popup.remove(); document.removeEventListener('click',rem); }
-        });
-      },0);
+      var dayRes = res.filter(function(r){ return r.date===ds; }).sort(function(a,b){ return a.time>b.time?1:a.time<b.time?-1:0; });
+      var scheduleDiv = document.getElementById('cal-schedule');
+      var scheduleList = document.getElementById('cal-schedule-list');
+
+      if(!dayRes.length){
+        scheduleDiv.style.display = 'none';
+        return;
+      }
+
+      scheduleList.innerHTML = dayRes.map(function(r){
+        var c = custs.find(function(x){ return x.id===r.customerId; });
+        var nm = c?c.name:(r.customerName||'—');
+        var statusClass = r.source==='sheets'?(r.status==='未確認'?'badge-tentative':'badge-confirmed'):(STATUS_CLASS[r.status]||'badge-pending');
+        var statusLabel = r.source==='sheets'?r.status:(STATUS_LABEL[r.status]||r.status);
+        var sourceBadge = r.source==='sheets'?'<span style="font-size:10px;background:#e8f5e9;color:#2e7d32;border-radius:3px;padding:1px 5px;margin-left:4px;">WEB</span>':'';
+        return '<div style="padding:12px;background:var(--sand);border-radius:6px;border-left:3px solid var(--ocean);">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
+            '<span style="font-weight:600;color:var(--ocean);">'+fmtTime(r.time)+'</span>'+
+            '<span class="badge '+statusClass+'">'+statusLabel+'</span>'+
+          '</div>'+
+          '<div style="color:var(--ink);font-weight:500;">'+esc(nm)+sourceBadge+'</div>'+
+          '<div style="color:var(--muted-d);font-size:13px;">'+esc(r.menu||'—')+'</div>'+
+          (r.notes?'<div style="color:var(--muted-d);font-size:12px;margin-top:6px;">メモ: '+esc(r.notes)+'</div>':'')+
+        '</div>';
+      }).join('');
+
+      scheduleDiv.style.display = 'block';
     });
   });
 }
