@@ -813,10 +813,62 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
             <label>ご要望</label>
             <textarea name="notes" placeholder="ご要望やご相談がございましたら、お気軽にご記入ください"></textarea>
           </div>
-          <button type="submit" class="form-submit-btn" id="form-submit-btn">送信する</button>
+          <button type="button" class="form-submit-btn" id="form-next-btn">次へ</button>
           <div id="form-msg" class="form-msg"></div>
-          <p class="form-note">※ ご予約確定後、お電話にてご連絡いたします。</p>
+          <p class="form-note">※ 初めてのお客様はご予約確定後、お電話にてご連絡いたします。</p>
         </form>
+
+        <!-- 確認画面 -->
+        <div id="res-confirm" style="display:none;">
+          <h3 style="font-family:var(--jp-head);font-size:17px;font-weight:500;color:#fff;letter-spacing:.1em;margin-bottom:24px;text-align:center;">ご予約内容の確認</h3>
+          <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:24px;margin-bottom:24px;font-size:14px;">
+            <div style="display:grid;gap:16px;">
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">お名前</span>
+                <span id="conf-name" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">ふりがな</span>
+                <span id="conf-kana" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">電話番号</span>
+                <span id="conf-phone" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">ご希望日</span>
+                <span id="conf-date" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">ご希望時間</span>
+                <span id="conf-time" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">ご希望メニュー</span>
+                <span id="conf-menu" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">ご住所</span>
+                <span id="conf-address" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">姿勢</span>
+                <span id="conf-posture" style="color:#fff;"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:12px;">
+                <span style="color:rgba(255,255,255,.7);">お支払い方法</span>
+                <span style="color:#fff;">現金</span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;">
+                <span style="color:rgba(255,255,255,.7);">ご要望</span>
+                <span id="conf-notes" style="color:#fff;word-break:break-word;"></span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="form-submit-btn" id="form-confirm-btn" style="width:100%;margin-bottom:12px;">予約する</button>
+          <button type="button" class="form-submit-btn" id="form-back-btn" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;">戻る</button>
+          <div id="form-msg-confirm" class="form-msg" style="margin-top:12px;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -943,32 +995,70 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
 })();
 </script>
 <script>
-/* ---------- reservation form submission ---------- */
+/* ---------- reservation form with confirmation ---------- */
 (function(){
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNSvTb2fzGlDU5wPr7TR608LBnTYhcw5E9VwM491BnEvWd_rDSnkgOMBeCFVcn0GIdtA/exec';
   var form = document.getElementById('res-form');
+  var confirmScreen = document.getElementById('res-confirm');
+  var formData = {};
+
   if(!form) return;
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    var btn = document.getElementById('form-submit-btn');
-    var msg = document.getElementById('form-msg');
-    var data = {};
+
+  // 「次へ」ボタン：フォーム検証＆確認画面表示
+  document.getElementById('form-next-btn').addEventListener('click', function(){
+    if(!form.checkValidity()){
+      form.reportValidity();
+      return;
+    }
+    // フォームデータ取得
+    formData = {};
     var fd = new FormData(form);
     fd.forEach(function(v,k){
-      if(k === 'menu'){
-        if(!data[k]) data[k] = [];
-        data[k].push(v);
+      if(k === 'menu' || k === 'posture'){
+        if(!formData[k]) formData[k] = [];
+        formData[k].push(v);
       } else {
-        data[k] = v;
+        formData[k] = v;
       }
     });
-    if(Array.isArray(data.menu)){
-      data.menu = data.menu.join('、');
+    if(Array.isArray(formData.menu)){
+      formData.menu = formData.menu.join('、');
     }
+    if(Array.isArray(formData.posture)){
+      formData.posture = formData.posture.join('、');
+    }
+
+    // 確認画面に値を表示
+    document.getElementById('conf-name').textContent = formData.name || '—';
+    document.getElementById('conf-kana').textContent = formData.kana || '—';
+    document.getElementById('conf-phone').textContent = formData.phone || '—';
+    document.getElementById('conf-date').textContent = formData.date || '—';
+    document.getElementById('conf-time').textContent = formData.time || '—';
+    document.getElementById('conf-menu').textContent = formData.menu || '—';
+    document.getElementById('conf-address').textContent = formData.address || '—';
+    document.getElementById('conf-posture').textContent = formData.posture || '—';
+    document.getElementById('conf-notes').textContent = formData.notes || '（なし）';
+
+    // 画面切り替え
+    form.style.display = 'none';
+    confirmScreen.style.display = 'block';
+  });
+
+  // 「戻る」ボタン：フォーム画面に戻す
+  document.getElementById('form-back-btn').addEventListener('click', function(){
+    confirmScreen.style.display = 'none';
+    form.style.display = 'block';
+  });
+
+  // 「予約する」ボタン：Google Sheetsに送信
+  document.getElementById('form-confirm-btn').addEventListener('click', function(){
+    var btn = this;
+    var msg = document.getElementById('form-msg-confirm');
     btn.disabled = true;
     btn.textContent = '送信中...';
     msg.style.display = 'none';
-    fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(data) })
+
+    fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(formData) })
       .then(function(r){ return r.json(); })
       .then(function(res){
         if(res.success){
@@ -976,6 +1066,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           msg.textContent = 'ご予約を受け付けました。確認のご連絡をさしあげます。';
           msg.style.display = 'block';
           form.reset();
+          setTimeout(function(){ form.style.display = 'block'; confirmScreen.style.display = 'none'; }, 2000);
         } else { throw new Error(); }
       })
       .catch(function(){
@@ -985,7 +1076,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       })
       .finally(function(){
         btn.disabled = false;
-        btn.textContent = '送信する';
+        btn.textContent = '予約する';
       });
   });
 })();
