@@ -1206,6 +1206,11 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
   }
 
   function isDayAvailable(date) {
+    var dateObj = new Date(date.replace(/-/g, '/'));
+    var dayOfWeek = dateObj.getDay();
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) return 'unavailable';
+
     var dayReservations = reservations.filter(r => r.date === date);
     if (dayReservations.length === 0) return 'available';
 
@@ -1287,8 +1292,15 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
 
     if (prevBtn) {
       prevBtn.addEventListener('click', function() {
-        currentMonth.setMonth(currentMonth.getMonth() - 1);
-        renderCalendar();
+        var today = new Date();
+        var prevMonth = new Date(currentMonth);
+        prevMonth.setMonth(prevMonth.getMonth() - 1);
+
+        if (prevMonth.getFullYear() > today.getFullYear() ||
+            (prevMonth.getFullYear() === today.getFullYear() && prevMonth.getMonth() >= today.getMonth())) {
+          currentMonth = prevMonth;
+          renderCalendar();
+        }
       });
     }
 
