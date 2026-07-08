@@ -1173,6 +1173,8 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           duration: calculateDuration(r['メニュー'] || '')
         }));
         renderCalendar();
+        updateTimeOptions();
+        window.dispatchEvent(new Event('kao:reservationsLoaded'));
       })
       .catch(e => {
         console.log('Calendar: using offline mode');
@@ -1199,6 +1201,57 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       return endHour <= rStart || startHour >= rEnd + (bufferTime / 60);
     });
   }
+
+  function timeToMinutes(t) {
+    var parts = (t || '9:00').split(':');
+    return (parseInt(parts[0]) || 9) * 60 + (parseInt(parts[1]) || 0);
+  }
+
+  function getSelectedMenuDuration() {
+    var checked = document.querySelectorAll('input[name="menu"]:checked');
+    if (!checked.length) return 1.5 * 60;
+    var maxDuration = 0;
+    checked.forEach(function(cb) {
+      var menuName = cb.value.split(' ')[0];
+      var duration = menuDurations[menuName] || 1.5 * 60;
+      maxDuration = Math.max(maxDuration, duration);
+    });
+    return maxDuration;
+  }
+
+  function updateTimeOptions() {
+    var dateInput = document.querySelector('input[name="date"]');
+    var timeSelect = document.querySelector('select[name="time"]');
+    if (!dateInput || !timeSelect) return;
+    var date = dateInput.value;
+    var dayReservations = reservations.filter(function(r) { return r.date === date; });
+    var candidateDuration = getSelectedMenuDuration();
+
+    Array.prototype.forEach.call(timeSelect.options, function(opt) {
+      if (!opt.value) return;
+      var startMin = timeToMinutes(opt.value);
+      var endMin = startMin + candidateDuration;
+      var conflict = dayReservations.some(function(r) {
+        var rStart = timeToMinutes(r.time);
+        var rEnd = rStart + r.duration;
+        return !(endMin + bufferTime <= rStart || startMin >= rEnd + bufferTime);
+      });
+      opt.disabled = conflict;
+      opt.textContent = conflict ? (opt.value + '（予約済み）') : opt.value;
+    });
+
+    if (timeSelect.selectedOptions[0] && timeSelect.selectedOptions[0].disabled) {
+      timeSelect.value = '';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var dateInput = document.querySelector('input[name="date"]');
+    if (dateInput) dateInput.addEventListener('change', updateTimeOptions);
+    document.querySelectorAll('input[name="menu"]').forEach(function(cb) {
+      cb.addEventListener('change', updateTimeOptions);
+    });
+  });
 
   function isDayAvailable(date) {
     var dateObj = new Date(date.replace(/-/g, '/'));
@@ -1400,6 +1453,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
             if (selectedInput) {
               selectedInput.value = date;
               selectedInput.focus();
+              updateTimeOptions();
             }
           });
         }
@@ -1409,6 +1463,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     }
 
     renderCalendarMini();
+    window.addEventListener('kao:reservationsLoaded', renderCalendarMini);
   });
 })();
 </script>
