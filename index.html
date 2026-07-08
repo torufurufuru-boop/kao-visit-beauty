@@ -354,6 +354,31 @@ nav.main a.link:hover::after{right:0;}
 .gal-item .cap{position:absolute;left:0;bottom:0;padding:18px 22px;z-index:2;background:linear-gradient(transparent,rgba(44,62,66,.55));width:100%;}
 .gal-item .cap span{font-family:var(--label);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#fff;}
 
+/* ---------- calendar ---------- */
+.calendar{background:var(--sand-d);text-align:center;}
+.calendar .inner{max-width:800px;margin:0 auto;}
+.cal-lede{font-size:15px;margin:18px 0 36px;}
+.calendar-container{margin-top:32px;}
+.calendar-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:16px;flex-wrap:wrap;}
+.calendar-nav button{background:var(--ocean);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-family:var(--jp);cursor:pointer;font-size:14px;font-weight:500;transition:.2s;}
+.calendar-nav button:hover{background:var(--deep);}
+.cal-month-year{font-family:var(--jp-head);font-size:18px;font-weight:600;color:var(--ink);}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:32px;}
+.calendar-grid .day-header{font-weight:600;color:var(--deep);font-size:13px;padding:12px 0;border-bottom:2px solid var(--ocean);}
+.calendar-grid .day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;font-size:14px;cursor:pointer;transition:.2s;border:2px solid transparent;}
+.calendar-grid .day-cell.available{background:var(--ocean-ll);color:var(--deep);border-color:var(--ocean);font-weight:600;}
+.calendar-grid .day-cell.available:hover{background:var(--ocean-l);}
+.calendar-grid .day-cell.unavailable{background:#e0e0e0;color:#999;cursor:not-allowed;}
+.calendar-grid .day-cell.partial{background:var(--dawn-l);color:var(--deep);border-color:var(--dawn);font-weight:600;}
+.calendar-grid .day-cell.empty{background:transparent;}
+.calendar-grid .day-cell.other-month{color:#ccc;}
+.calendar-legend{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;padding:16px;background:#fff;border-radius:8px;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:14px;}
+.legend-box{width:20px;height:20px;border-radius:4px;border:2px solid transparent;}
+.legend-box.available{background:var(--ocean-ll);border-color:var(--ocean);}
+.legend-box.unavailable{background:#e0e0e0;}
+.legend-box.partial{background:var(--dawn-l);border-color:var(--dawn);}
+
 /* ---------- reserve ---------- */
 .reserve{background:var(--deep);color:#fff;position:relative;overflow:hidden;text-align:center;}
 .reserve::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(91,174,188,.4),transparent 55%),radial-gradient(circle at 85% 90%,rgba(244,197,186,.28),transparent 50%);}
@@ -687,6 +712,42 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       <div class="gal-item reveal d2">
         <div class="ph" style="width:100%;height:100%;" data-ph="Gallery — 追加">
           <img alt="施術の様子" data-src="assets/a57a9868-3ee0-4da5-a394-ea4016d66e90.jpeg">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AVAILABILITY CALENDAR ========== -->
+<section class="calendar pad" id="calendar">
+  <div class="wrap">
+    <div class="inner">
+      <div class="eyebrow center reveal">Availability</div>
+      <h2 class="section-en reveal d1" style="font-family:var(--jp-head);font-style:normal;font-size:clamp(30px,4.4vw,52px);line-height:1.55;letter-spacing:.06em;">予約可能日</h2>
+      <p class="cal-lede reveal d2">下記カレンダーから予約可能な日付をご確認ください。自転車での移動時間を考慮した予約管理を行っています。</p>
+
+      <div class="calendar-container reveal d3">
+        <div class="calendar-nav">
+          <button class="cal-prev">← 前月</button>
+          <div class="cal-month-year" id="calMonthYear"></div>
+          <button class="cal-next">次月 →</button>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
+
+        <div class="calendar-legend">
+          <div class="legend-item">
+            <span class="legend-box available"></span>
+            <span>予約可能</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-box unavailable"></span>
+            <span>予約不可</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-box partial"></span>
+            <span>一部予約可</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1078,6 +1139,174 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
         btn.disabled = false;
         btn.textContent = '予約する';
       });
+  });
+})();
+
+/* ---------- availability calendar ---------- */
+(function(){
+  var MAPS_API_KEY = 'AIzaSyBSz_9UT29CmFgBswXxDHrlQYDBT1VcLsQ';
+  var SCRIPT_URL_CAL = 'https://script.google.com/macros/s/AKfycbzNSvTb2fzGlDU5wPr7TR608LBnTYhcw5E9VwM491BnEvWd_rDSnkgOMBeCFVcn0GIdtA/exec';
+
+  var menuDurations = {
+    'カット&ブロー': 1.5 * 60,
+    'カット&ブロー(ベット上での施術)': 1.5 * 60,
+    'カット&カラー': 2.5 * 60,
+    'カット&パーマ': 2.5 * 60,
+    'シャンプー': 60
+  };
+
+  var businessHours = { start: 9, end: 18 };
+  var bufferTime = 30;
+  var defaultAddress = '逗子市沼間4-4-19';
+
+  var currentMonth = new Date();
+  var reservations = [];
+
+  function formatDate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function fetchReservations() {
+    fetch(SCRIPT_URL_CAL + '?action=get')
+      .then(r => r.json())
+      .then(data => {
+        reservations = (data.reservations || []).map(r => ({
+          date: r['ご希望日'] || '',
+          time: r['ご希望時間'] || '',
+          menus: (r['メニュー'] || '').split('、'),
+          address: r['ご住所'] || defaultAddress,
+          duration: calculateDuration(r['メニュー'] || '')
+        }));
+        renderCalendar();
+      })
+      .catch(e => {
+        console.log('Calendar: using offline mode');
+        renderCalendar();
+      });
+  }
+
+  function calculateDuration(menuStr) {
+    if (!menuStr) return 1.5 * 60;
+    var menus = menuStr.split('、');
+    var maxDuration = 0;
+    menus.forEach(function(menu) {
+      var duration = menuDurations[menu.trim()] || 1.5 * 60;
+      maxDuration = Math.max(maxDuration, duration);
+    });
+    return maxDuration;
+  }
+
+  function isTimeSlotAvailable(date, startHour, endHour) {
+    return reservations.every(function(r) {
+      if (r.date !== date) return true;
+      var rStart = parseInt(r.time.split(':')[0]) || 9;
+      var rEnd = rStart + Math.ceil(r.duration / 60);
+      return endHour <= rStart || startHour >= rEnd + (bufferTime / 60);
+    });
+  }
+
+  function isDayAvailable(date) {
+    var dayReservations = reservations.filter(r => r.date === date);
+    if (dayReservations.length === 0) return 'available';
+
+    for (var h = businessHours.start; h < businessHours.end; h++) {
+      if (isTimeSlotAvailable(date, h, h + 2)) return 'partial';
+    }
+    return 'unavailable';
+  }
+
+  function renderCalendar() {
+    var year = currentMonth.getFullYear();
+    var month = currentMonth.getMonth();
+
+    document.getElementById('calMonthYear').textContent =
+      year + '年 ' + (month + 1) + '月';
+
+    var firstDay = new Date(year, month, 1).getDay();
+    var lastDate = new Date(year, month + 1, 0).getDate();
+    var grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    var dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+    dayNames.forEach(function(name) {
+      var h = document.createElement('div');
+      h.className = 'day-header';
+      h.textContent = name;
+      grid.appendChild(h);
+    });
+
+    for (var i = 0; i < firstDay; i++) {
+      var empty = document.createElement('div');
+      empty.className = 'day-cell empty';
+      grid.appendChild(empty);
+    }
+
+    var today = new Date();
+    for (var d = 1; d <= lastDate; d++) {
+      var cell = document.createElement('div');
+      var cellDate = new Date(year, month, d);
+      var dateStr = formatDate(cellDate);
+
+      if (cellDate < today) {
+        cell.className = 'day-cell unavailable';
+        cell.textContent = d;
+        grid.appendChild(cell);
+        continue;
+      }
+
+      if (dateStr < formatDate(new Date())) {
+        cell.className = 'day-cell unavailable other-month';
+        cell.textContent = d;
+        grid.appendChild(cell);
+        continue;
+      }
+
+      var availability = isDayAvailable(dateStr);
+      cell.className = 'day-cell ' + availability;
+      cell.textContent = d;
+
+      if (availability !== 'unavailable') {
+        cell.style.cursor = 'pointer';
+        cell.addEventListener('click', function() {
+          var selectedInput = document.querySelector('input[name="希望日"]');
+          if (selectedInput) {
+            selectedInput.value = dateStr.replace(/-/g, '/');
+            selectedInput.focus();
+            document.querySelector('input[name="希望日"]').scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var prevBtn = document.querySelector('.cal-prev');
+    var nextBtn = document.querySelector('.cal-next');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function() {
+        currentMonth.setMonth(currentMonth.getMonth() - 1);
+        renderCalendar();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function() {
+        var today = new Date();
+        var maxMonth = new Date(today.getFullYear(), today.getMonth() + 3, 1);
+        var nextMonth = new Date(currentMonth);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+        if (nextMonth <= maxMonth) {
+          currentMonth = nextMonth;
+          renderCalendar();
+        }
+      });
+    }
+
+    fetchReservations();
   });
 })();
 </script>
