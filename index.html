@@ -871,7 +871,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           <div style="font-size:36px;margin-bottom:16px;">✓</div>
           <h3 style="font-family:var(--jp-head);font-size:20px;font-weight:500;color:#fff;letter-spacing:.12em;margin-bottom:12px;">予約が完了しました</h3>
           <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.8;letter-spacing:.06em;margin-bottom:28px;">ご予約を受け付けました。<br>確認のご連絡をさしあげます。</p>
-          <button type="button" class="form-submit-btn" id="res-complete-btn" style="width:auto;padding:0 32px;">新しい予約をする</button>
+          <button type="button" class="form-submit-btn" id="res-complete-btn" style="width:auto;padding:0 32px;">閉じる</button>
         </div>
 
         <!-- 確認画面 -->
@@ -1168,12 +1168,12 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
   var SCRIPT_URL_CAL = 'https://script.google.com/macros/s/AKfycbzNSvTb2fzGlDU5wPr7TR608LBnTYhcw5E9VwM491BnEvWd_rDSnkgOMBeCFVcn0GIdtA/exec';
 
   var menuDurations = {
-    'カット&ブロー': 1.5 * 60,
-    'カット&ブロー(ベット上での施術)': 1.5 * 60,
-    'カット&カラー': 2.5 * 60,
-    'カット&パーマ': 2.5 * 60,
-    'シャンプー': 60
+    'カット&ブロー': 60,
+    'カット&ブロー(ベット上での施術)': 60,
+    'カット&カラー': 150,
+    'カット&パーマ': 150
   };
+  var SHAMPOO_EXTRA = 30;
 
   var businessHours = { start: 9, end: 18 };
   var bufferTime = 30;
@@ -1207,15 +1207,23 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       });
   }
 
+  function parseMenuName(v) {
+    return v.trim().split(/\s+¥/)[0].trim();
+  }
+
   function calculateDuration(menuStr) {
-    if (!menuStr) return 1.5 * 60;
+    if (!menuStr) return 60;
     var menus = menuStr.split('、');
-    var maxDuration = 0;
-    menus.forEach(function(menu) {
-      var duration = menuDurations[menu.trim()] || 1.5 * 60;
-      maxDuration = Math.max(maxDuration, duration);
+    var base = 0;
+    var hasShampoo = false;
+    menus.forEach(function(m) {
+      var name = parseMenuName(m);
+      if (name.indexOf('シャンプー') >= 0) { hasShampoo = true; return; }
+      var d = menuDurations[name] || 60;
+      if (d > base) base = d;
     });
-    return maxDuration;
+    if (!base) return SHAMPOO_EXTRA;
+    return base + (hasShampoo ? SHAMPOO_EXTRA : 0);
   }
 
   function isTimeSlotAvailable(date, startHour, endHour) {
@@ -1234,14 +1242,17 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
 
   function getSelectedMenuDuration() {
     var checked = document.querySelectorAll('input[name="menu"]:checked');
-    if (!checked.length) return 1.5 * 60;
-    var maxDuration = 0;
+    if (!checked.length) return 60;
+    var base = 0;
+    var hasShampoo = false;
     checked.forEach(function(cb) {
-      var menuName = cb.value.split(' ')[0];
-      var duration = menuDurations[menuName] || 1.5 * 60;
-      maxDuration = Math.max(maxDuration, duration);
+      var name = parseMenuName(cb.value);
+      if (name.indexOf('シャンプー') >= 0) { hasShampoo = true; return; }
+      var d = menuDurations[name] || 60;
+      if (d > base) base = d;
     });
-    return maxDuration;
+    if (!base) return SHAMPOO_EXTRA;
+    return base + (hasShampoo ? SHAMPOO_EXTRA : 0);
   }
 
   function updateTimeOptions() {
