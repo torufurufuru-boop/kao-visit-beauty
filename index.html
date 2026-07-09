@@ -1223,11 +1223,12 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           address: r['ご住所'] || defaultAddress,
           duration: calculateDuration(r['メニュー'] || '')
         }));
+        console.log('[kao-debug] reservations:', JSON.stringify(reservations, null, 2));
         updateTimeOptions();
         window.dispatchEvent(new Event('kao:reservationsLoaded'));
       })
       .catch(e => {
-        console.log('Calendar: using offline mode');
+        console.log('Calendar: using offline mode', e);
       });
   }
 
@@ -1286,6 +1287,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     var date = dateInput.value;
     var dayReservations = reservations.filter(function(r) { return r.date === date; });
     var candidateDuration = getSelectedMenuDuration();
+    console.log('[kao-debug] updateTimeOptions: date=', date, 'candidateDuration=', candidateDuration, 'dayReservations=', JSON.stringify(dayReservations));
 
     Array.prototype.forEach.call(timeSelect.options, function(opt) {
       if (!opt.value) return;
