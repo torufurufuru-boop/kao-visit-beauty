@@ -1209,13 +1209,11 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           address: r['ご住所'] || defaultAddress,
           duration: calculateDuration(r['メニュー'] || '')
         }));
-        renderCalendar();
         updateTimeOptions();
         window.dispatchEvent(new Event('kao:reservationsLoaded'));
       })
       .catch(e => {
         console.log('Calendar: using offline mode');
-        renderCalendar();
       });
   }
 
@@ -1316,106 +1314,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     return 'unavailable';
   }
 
-  function renderCalendar() {
-    var year = currentMonth.getFullYear();
-    var month = currentMonth.getMonth();
-
-    document.getElementById('calMonthYear').textContent =
-      year + '年 ' + (month + 1) + '月';
-
-    var firstDay = new Date(year, month, 1).getDay();
-    var lastDate = new Date(year, month + 1, 0).getDate();
-    var grid = document.getElementById('calendarGrid');
-    grid.innerHTML = '';
-
-    var dayNames = ['日', '月', '火', '水', '木', '金', '土'];
-    dayNames.forEach(function(name) {
-      var h = document.createElement('div');
-      h.className = 'day-header';
-      h.textContent = name;
-      grid.appendChild(h);
-    });
-
-    for (var i = 0; i < firstDay; i++) {
-      var empty = document.createElement('div');
-      empty.className = 'day-cell empty';
-      grid.appendChild(empty);
-    }
-
-    var today = new Date();
-    for (var d = 1; d <= lastDate; d++) {
-      var cell = document.createElement('div');
-      var cellDate = new Date(year, month, d);
-      var dateStr = formatDate(cellDate);
-
-      if (cellDate < today) {
-        cell.className = 'day-cell unavailable';
-        cell.textContent = d;
-        grid.appendChild(cell);
-        continue;
-      }
-
-      if (dateStr < formatDate(new Date())) {
-        cell.className = 'day-cell unavailable other-month';
-        cell.textContent = d;
-        grid.appendChild(cell);
-        continue;
-      }
-
-      var availability = isDayAvailable(dateStr);
-      cell.className = 'day-cell ' + availability;
-      cell.textContent = d;
-
-      if (availability !== 'unavailable') {
-        cell.style.cursor = 'pointer';
-        cell.dataset.date = dateStr;
-        cell.addEventListener('click', function(e) {
-          var date = e.target.dataset.date;
-          var selectedInput = document.querySelector('input[name="希望日"]');
-          if (selectedInput) {
-            selectedInput.value = date.replace(/-/g, '/');
-            selectedInput.focus();
-            selectedInput.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      }
-
-      grid.appendChild(cell);
-    }
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
-    var prevBtn = document.querySelector('.cal-prev');
-    var nextBtn = document.querySelector('.cal-next');
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function() {
-        var today = new Date();
-        var prevMonth = new Date(currentMonth);
-        prevMonth.setMonth(prevMonth.getMonth() - 1);
-
-        if (prevMonth.getFullYear() > today.getFullYear() ||
-            (prevMonth.getFullYear() === today.getFullYear() && prevMonth.getMonth() >= today.getMonth())) {
-          currentMonth = prevMonth;
-          renderCalendar();
-        }
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function() {
-        var today = new Date();
-        var maxMonth = new Date(today.getFullYear(), today.getMonth() + 3, 1);
-        var nextMonth = new Date(currentMonth);
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-
-        if (nextMonth <= maxMonth) {
-          currentMonth = nextMonth;
-          renderCalendar();
-        }
-      });
-    }
-
     fetchReservations();
 
     // Mini calendar in form
