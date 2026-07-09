@@ -1186,12 +1186,24 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
 
+  function normDate(v) {
+    if (!v) return '';
+    var s = String(v);
+    if (s.includes('T')) {
+      var d = new Date(s);
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return m[1] + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[3]).padStart(2,'0');
+    return s;
+  }
+
   function fetchReservations() {
     fetch(SCRIPT_URL_CAL + '?action=get')
       .then(r => r.json())
       .then(data => {
         reservations = (data.reservations || []).map(r => ({
-          date: r['ご希望日'] || '',
+          date: normDate(r['ご希望日'] || ''),
           time: r['ご希望時間'] || '',
           menus: (r['メニュー'] || '').split('、'),
           address: r['ご住所'] || defaultAddress,
