@@ -866,6 +866,14 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
           <p class="form-note">※ 初めてのお客様はご予約確定後、お電話にてご連絡いたします。</p>
         </form>
 
+        <!-- 完了画面 -->
+        <div id="res-complete" style="display:none;text-align:center;padding:40px 0;">
+          <div style="font-size:36px;margin-bottom:16px;">✓</div>
+          <h3 style="font-family:var(--jp-head);font-size:20px;font-weight:500;color:#fff;letter-spacing:.12em;margin-bottom:12px;">予約が完了しました</h3>
+          <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.8;letter-spacing:.06em;margin-bottom:28px;">ご予約を受け付けました。<br>確認のご連絡をさしあげます。</p>
+          <button type="button" class="form-submit-btn" id="res-complete-btn" style="width:auto;padding:0 32px;">新しい予約をする</button>
+        </div>
+
         <!-- 確認画面 -->
         <div id="res-confirm" style="display:none;">
           <h3 style="font-family:var(--jp-head);font-size:17px;font-weight:500;color:#fff;letter-spacing:.1em;margin-bottom:24px;text-align:center;">ご予約内容の確認</h3>
@@ -1096,14 +1104,30 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
     document.getElementById('conf-notes').textContent = formData.notes || '（なし）';
 
     // 画面切り替え
+    var msgConfirm = document.getElementById('form-msg-confirm');
+    if(msgConfirm){ msgConfirm.style.display = 'none'; msgConfirm.textContent = ''; }
     form.style.display = 'none';
     confirmScreen.style.display = 'block';
+    // 確認画面の上部が見えるようスクロール（固定ヘッダー80px分オフセット）
+    var top = confirmScreen.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top: top, behavior: 'smooth' });
   });
 
   // 「戻る」ボタン：フォーム画面に戻す
   document.getElementById('form-back-btn').addEventListener('click', function(){
     confirmScreen.style.display = 'none';
     form.style.display = 'block';
+    var top = form.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top: top, behavior: 'smooth' });
+  });
+
+  // 「新しい予約をする」ボタン：完了画面からフォームに戻す
+  document.getElementById('res-complete-btn').addEventListener('click', function(){
+    var completeScreen = document.getElementById('res-complete');
+    if(completeScreen) completeScreen.style.display = 'none';
+    form.style.display = 'block';
+    var top = form.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top: top, behavior: 'smooth' });
   });
 
   // 「予約する」ボタン：Google Sheetsに送信
@@ -1118,19 +1142,20 @@ footer{background:var(--ink);color:rgba(255,255,255,.78);padding:74px 0 40px;}
       .then(function(r){ return r.json(); })
       .then(function(res){
         if(res.success){
-          msg.className = 'form-msg ok';
-          msg.textContent = 'ご予約を受け付けました。確認のご連絡をさしあげます。';
-          msg.style.display = 'block';
           form.reset();
-          setTimeout(function(){ form.style.display = 'block'; confirmScreen.style.display = 'none'; }, 2000);
+          confirmScreen.style.display = 'none';
+          var completeScreen = document.getElementById('res-complete');
+          if(completeScreen){
+            completeScreen.style.display = 'block';
+            var top = completeScreen.getBoundingClientRect().top + window.pageYOffset - 90;
+            window.scrollTo({ top: top, behavior: 'smooth' });
+          }
         } else { throw new Error(); }
       })
       .catch(function(){
         msg.className = 'form-msg err';
         msg.textContent = '送信に失敗しました。お電話またはLINEでご連絡ください。';
         msg.style.display = 'block';
-      })
-      .finally(function(){
         btn.disabled = false;
         btn.textContent = '予約する';
       });

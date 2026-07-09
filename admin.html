@@ -469,6 +469,12 @@ function fmtTime(t){
 function normDate(v){
   if(!v) return '';
   var s = String(v);
+  // ISO datetime strings from Google Sheets (e.g. "2026-07-14T15:00:00.000Z") must be
+  // converted using local date getters to avoid the UTC-vs-JST 9-hour offset.
+  if(s.includes('T')){
+    var d = new Date(s);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
   var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
   return s;
